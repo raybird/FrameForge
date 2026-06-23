@@ -3,7 +3,7 @@
  * 實作分散在 engine-core / engine-three / engine-audio…，但契約集中在這裡。
  */
 
-import type { Seconds, Tick } from './time';
+import type { Seconds, Tick, TickRate } from './time';
 import type { ReplayLog } from './replay.schema';
 import type { WorldState } from './worldstate.schema';
 
@@ -15,18 +15,26 @@ export type SchedulerMode = 'realtime' | 'deterministic';
 
 export interface FrameScheduler {
   readonly mode: SchedulerMode;
+  readonly tickRate: TickRate;
   /** 目前 tick（真相時間）。 */
   readonly tick: Tick;
+  /** 衍生顯示值（tick / tickRate）。 */
+  readonly seconds: Seconds;
+  readonly playing: boolean;
 
   play(): void;
   pause(): void;
   resume(): void;
 
-  /** 推進一段時間（內部換算為整數 tick；realtime 模式由 rAF 餵 dt）。 */
-  tick_(dt: Seconds): void;
+  /**
+   * 推進一段真實時間（秒）。realtime 模式由 rAF 餵 dt。
+   * 內部用 fractional accumulator 換算為「整數 tick」——accumulator 只用於即時節奏，
+   * 不是真相時間（真相永遠是整數 tick）。
+   */
+  advance(dtSeconds: Seconds): void;
 
   /** 跳到指定時間（秒會先量化為 tick）。 */
-  seek(time: Seconds): void;
+  seek(timeSeconds: Seconds): void;
 
   /** 播放速率（0.5 / 1 / 2…）。 */
   setSpeed(speed: number): void;
