@@ -1,0 +1,19 @@
+{
+  "name": "@frameforge/example-basic-seek",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "最小示範：拖時間軸 → 場景 seek（純 f(tick)）",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vite": "^5.4.10"
+  }
+}

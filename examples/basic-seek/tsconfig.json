@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "esnext",
+    "target": "es2022",
+    "lib": ["es2022", "dom"],
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@frameforge/shared-types": ["../../packages/shared-types/src/index.ts"],
+      "@frameforge/engine-core": ["../../packages/engine-core/src/index.ts"],
+      "@frameforge/engine-three": ["../../packages/engine-three/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}

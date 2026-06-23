@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FrameForge — basic seek demo</title>
+    <style>
+      :root { color-scheme: dark; }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #0b0b0e;
+        color: #e6e6ea;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+      }
+      h1 { font-size: 16px; font-weight: 600; margin: 0; opacity: 0.8; }
+      #stage { border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,.5); }
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 800px;
+        max-width: 100%;
+      }
+      .controls button, .controls select {
+        background: #1c1c22;
+        color: #e6e6ea;
+        border: 1px solid #33333a;
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      #scrubber { flex: 1; }
+      #time { font-variant-numeric: tabular-nums; min-width: 110px; text-align: right; opacity: 0.85; }
+      .hint { font-size: 12px; opacity: 0.5; max-width: 800px; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <h1>FrameForge — 拖時間軸即 seek（決定性 f(tick)）</h1>
+    <canvas id="stage" width="800" height="500"></canvas>
+    <div class="controls">
+      <button id="play">▶ 播放</button>
+      <select id="speed" title="速度">
+        <option value="0.5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="2">2×</option>
+      </select>
+      <input id="scrubber" type="range" min="0" max="240" value="0" step="1" />
+      <span id="time">tick 0 / 0.00s</span>
+    </div>
+    <p class="hint">
+      拖動時間軸可任意 seek；同一 tick 永遠得到同一畫面（純函數求值，零漂移）。
+      方塊全是 placeholder——這支 demo 驗證的是「時間軸 → WorldState → Three.js 投影」的管線。
+    </p>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
