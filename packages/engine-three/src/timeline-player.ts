@@ -10,13 +10,18 @@
  * - realtime play：用 rAF 餵真實 dt 給 scheduler（牆鐘僅用於即時節奏，非真相時間）。
  */
 
-import type { FrameAdapter, SceneTimeline, Tick } from '@frameforge/shared-types';
+import type { FrameAdapter, SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
 import { Scheduler, evaluate } from '@frameforge/engine-core';
 import type { Stage } from './stage';
 
 export interface TimelinePlayerOptions {
   seed?: number;
   scheduler?: Scheduler;
+  /**
+   * 自訂「tick → WorldState」求值器。預設純 authored 求值（evaluate）。
+   * 接 ReplaySession 時傳 (t) => session.seek(t)，即可播 authored ⊕ interactive 並支援 replay。
+   */
+  evaluateAt?: (tick: Tick) => WorldState;
   /** 每渲染一幀後觸發（play 與 seek 都會），供 UI 同步時間軸滑桿等。 */
   onRender?: (tick: Tick) => void;
 }
@@ -24,7 +29,7 @@ export interface TimelinePlayerOptions {
 export class TimelinePlayer {
   readonly scheduler: Scheduler;
   private readonly adapters: FrameAdapter[];
-  private readonly seed?: number;
+  private readonly evaluateAt: (tick: Tick) => WorldState;
   private readonly onRender?: (tick: Tick) => void;
   private rafId: number | null = null;
   private lastMs = 0;
@@ -35,7 +40,8 @@ export class TimelinePlayer {
     adapters: FrameAdapter[],
     opts: TimelinePlayerOptions = {},
   ) {
-    this.seed = opts.seed;
+    this.evaluateAt =
+      opts.evaluateAt ?? ((tick) => evaluate(this.timeline, tick, { seed: opts.seed }));
     this.onRender = opts.onRender;
     // 依 priority 升冪：Scene(0) → Entity(1) → …
     this.adapters = [...adapters].sort((a, b) => a.priority - b.priority);
@@ -61,7 +67,7 @@ export class TimelinePlayer {
 
   /** 求值 → 分發 → 渲染一幀。 */
   renderAt(tick: Tick): void {
-    const world = evaluate(this.timeline, tick, { seed: this.seed });
+    const world = this.evaluateAt(tick);
     const seconds = tick / this.timeline.tickRate;
     for (const a of this.adapters) a.seek(seconds, { world });
     this.stage.renderFrame();

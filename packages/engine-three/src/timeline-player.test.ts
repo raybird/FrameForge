@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
-import type { FrameAdapter, ReplayContext, Seconds } from '@frameforge/shared-types';
+import type { FrameAdapter, ReplayContext, SceneTimeline, Seconds } from '@frameforge/shared-types';
+import {
+  ControllerRegistry,
+  KinematicController,
+  ReplayRecorder,
+  ReplaySession,
+} from '@frameforge/engine-core';
 import { Stage } from './stage';
 import { EntityAdapter } from './adapters/entity-adapter';
 import { SceneAdapter } from './adapters/scene-adapter';
@@ -59,6 +65,54 @@ describe('TimelinePlayer', () => {
     calls.length = 0;
     player.seekTick(10);
     expect(calls).toEqual(['scene', 'entity']);
+  });
+
+  it('可接 ReplaySession：播 interactive 並支援 replay seek', () => {
+    const timeline: SceneTimeline = {
+      id: 'inter',
+      name: 'Inter',
+      tickRate: 60,
+      durationTicks: 60,
+      assets: [],
+      entities: [{ id: 'hero', name: 'Hero', components: [] }],
+      tracks: [
+        {
+          id: 'seg_hero',
+          entityId: 'hero',
+          kind: 'interactive',
+          target: 'transform.position',
+          startTick: 0,
+          endTick: null,
+          controller: 'kinematic',
+          params: { position: { x: 0, y: 0, z: 0 }, speed: 1 },
+        },
+      ],
+      events: [],
+    };
+    const recorder = new ReplayRecorder('inter', 60, 1);
+    recorder.record(5, 'move', { entityId: 'hero', dx: 1 });
+    const sessionLog = recorder.build();
+    const session = new ReplaySession(timeline, {
+      registry: new ControllerRegistry().register(KinematicController),
+      log: sessionLog,
+    });
+
+    const stage = new Stage();
+    const entityAdapter = new EntityAdapter(stage.scene, timeline.entities);
+    const player = new TimelinePlayer(timeline, stage, [entityAdapter], {
+      evaluateAt: (t) => session.seek(t),
+    });
+    player.mount();
+
+    player.seekTick(15);
+    const x15 = entityAdapter.getObject('hero')!.position.x;
+    expect(x15).toBeGreaterThan(0); // move@5 後往右
+
+    player.seekTick(0);
+    expect(entityAdapter.getObject('hero')!.position.x).toBeCloseTo(0);
+
+    player.seekTick(15);
+    expect(entityAdapter.getObject('hero')!.position.x).toBeCloseTo(x15); // replay 一致
   });
 
   it('無 renderer 時 renderAt 不丟錯', () => {

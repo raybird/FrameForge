@@ -41,7 +41,7 @@
     </style>
   </head>
   <body>
-    <h1>FrameForge — 拖時間軸即 seek（決定性 f(tick)）</h1>
+    <h1>FrameForge — 錄製互動 → 倒帶 → 完美重播（命脈①＋②）</h1>
     <canvas id="stage" width="800" height="500"></canvas>
     <div class="controls">
       <button id="play">▶ 播放</button>
@@ -50,12 +50,14 @@
         <option value="1" selected>1×</option>
         <option value="2">2×</option>
       </select>
-      <input id="scrubber" type="range" min="0" max="240" value="0" step="1" />
+      <input id="scrubber" type="range" min="0" max="600" value="0" step="1" />
       <span id="time">tick 0 / 0.00s</span>
+      <button id="reset" title="清除錄製，回到空白時間軸">⟲ 清除</button>
     </div>
     <p class="hint">
-      拖動時間軸可任意 seek；同一 tick 永遠得到同一畫面（純函數求值，零漂移）。
-      方塊全是 placeholder——這支 demo 驗證的是「時間軸 → WorldState → Three.js 投影」的管線。
+      <b>用法</b>：按 ▶ 播放後，用<b>方向鍵</b>駕駛黃色方塊（hero）四處移動——你的操作會被即時錄製。
+      接著把<b>時間軸滑桿往回拖</b>，就會看到剛才的操作被逐 tick 完美重播；同一 tick 永遠同一畫面（決定性、零漂移）。
+      旋轉的方塊是 authored 動畫，與互動同軌共存。
     </p>
     <script type="module" src="/src/main.ts"></script>
   </body>

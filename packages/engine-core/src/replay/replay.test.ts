@@ -139,6 +139,40 @@ describe('ReplaySession — 命脈②：決定性 / 零漂移', () => {
   });
 });
 
+describe('ReplaySession — 即時錄製（live edge）', () => {
+  function emptySession(snapshotInterval = 20): ReplaySession {
+    return new ReplaySession(makeTimeline(), { registry: registry(), seed: SEED, snapshotInterval });
+  }
+
+  it('錄製後 seek 反映新事件，且仍決定性', () => {
+    const s = emptySession();
+    s.recordEvent(11, 'move', { entityId: 'hero', dx: 1 });
+    // move@11 起每 tick +1，到 tick 20 → x = 10
+    expect(heroPos(s.seek(20)).x).toBeCloseTo(10);
+    // 重複/回跳仍一致
+    expect(s.seek(20)).toEqual(s.seek(20));
+    expect(heroPos(s.seek(5)).x).toBeCloseTo(0);
+  });
+
+  it('錄製會失效 >= tick 的 snapshot', () => {
+    const s = emptySession(20);
+    s.seek(120); // 建立 0,20,...,120
+    expect(s.snapshotTicks()).toEqual([0, 20, 40, 60, 80, 100, 120]);
+    s.recordEvent(65, 'move', { entityId: 'hero', dx: 1 });
+    expect(s.snapshotTicks()).toEqual([0, 20, 40, 60]); // 80/100/120 失效
+  });
+
+  it('exportLog 匯出原始 + 即時錄製，依 tick 排序', () => {
+    const s = session(); // 已含原始 log（10/30/55/80）
+    s.recordEvent(25, 'move', { entityId: 'hero', dy: 1 });
+    const log = s.exportLog();
+    const ticks = log.events.map((e) => e.tick);
+    expect(ticks).toEqual([...ticks].sort((a, b) => a - b));
+    expect(ticks).toContain(25);
+    expect(log.seed).toBe(SEED);
+  });
+});
+
 describe('ReplaySession — 純 authored 場景', () => {
   it('無 interactive segment 時 seek == evaluate', () => {
     const tl = makeTimeline();

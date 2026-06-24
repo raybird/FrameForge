@@ -11,6 +11,7 @@
 
 import type {
   InteractiveSegment,
+  JsonValue,
   ReplayEvent,
   ReplayLog,
   SceneTimeline,
@@ -65,6 +66,35 @@ export class ReplaySession {
     const world = evaluate(this.timeline, target, { seed: this.seed });
     this.sim.project(world);
     return world;
+  }
+
+  /**
+   * 即時錄製一個事件（互動的 live edge）。
+   * 會失效「>= tick」的 snapshot（它們在事件加入前算的，已過時），確保之後 seek 重算正確。
+   * 注意：事件在 step 到 tick 時被消耗，故 tick 應 >= 1（tick 0 的事件不會被處理）。
+   */
+  recordEvent(tick: Tick, type: string, payload: JsonValue): void {
+    const t = tick < 1 ? 1 : tick;
+    const arr = this.eventsByTick.get(t);
+    if (arr) arr.push({ tick: t, type, payload });
+    else this.eventsByTick.set(t, [{ tick: t, type, payload }]);
+
+    for (let i = this.snapshots.length - 1; i >= 1; i--) {
+      if (this.snapshots[i].tick >= t) this.snapshots.splice(i, 1);
+    }
+  }
+
+  /** 匯出目前完整 log（原始 + 即時錄製），可持久化/分享。 */
+  exportLog(): ReplayLog {
+    const ticks = [...this.eventsByTick.keys()].sort((a, b) => a - b);
+    const events: ReplayEvent[] = [];
+    for (const t of ticks) events.push(...this.eventsByTick.get(t)!);
+    return {
+      sceneId: this.timeline.id,
+      tickRate: this.timeline.tickRate,
+      seed: this.seed,
+      events,
+    };
   }
 
   /** 目前已記錄的 snapshot tick（測試/偵錯用）。 */
