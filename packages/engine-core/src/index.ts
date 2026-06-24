@@ -16,3 +16,13 @@ export type { EvaluateOptions } from './timeline/evaluator';
 
 export { Scheduler } from './scheduler/scheduler';
 export type { SchedulerOptions } from './scheduler/scheduler';
+
+// Replay（命脈②）
+export { ControllerRegistry } from './replay/controller';
+export type { Controller, ControllerState, StepContext } from './replay/controller';
+export { KinematicController } from './replay/kinematic-controller';
+export { Simulation, cloneSimState } from './replay/simulation';
+export type { SimState } from './replay/simulation';
+export { ReplayRecorder, indexEvents } from './replay/replay-log';
+export { ReplaySession } from './replay/replay-session';
+export type { ReplaySessionOptions } from './replay/replay-session';
