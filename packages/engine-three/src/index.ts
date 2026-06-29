@@ -8,7 +8,7 @@
 export { Stage } from './stage';
 export type { StageOptions } from './stage';
 
-export { defaultObjectFactory } from './object-factory';
+export { defaultObjectFactory, colorForEntity } from './object-factory';
 export type { ObjectFactory } from './object-factory';
 
 export { EntityAdapter, applyEntityState } from './adapters/entity-adapter';

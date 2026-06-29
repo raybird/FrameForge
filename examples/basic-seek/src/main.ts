@@ -25,16 +25,22 @@ function makeTimeline(): SceneTimeline {
         components: [
           {
             type: 'Transform',
-            data: { position: { x: 0, y: -1.2, z: 0 }, scale: { x: 16, y: 0.3, z: 16 } },
+            data: {
+              position: { x: 0, y: -1.2, z: 0 },
+              scale: { x: 16, y: 0.3, z: 16 },
+              color: 0x2e7d32,
+            },
           },
         ],
       },
       {
         id: 'spinner',
         name: 'Spinner',
-        components: [{ type: 'Transform', data: { position: { x: -4, y: 0.5, z: -2 } } }],
+        components: [
+          { type: 'Transform', data: { position: { x: -4, y: 0.5, z: -2 }, color: 0x3a86ff } },
+        ],
       },
-      { id: 'hero', name: 'Hero', components: [] },
+      { id: 'hero', name: 'Hero', components: [{ type: 'Sprite', data: { color: 0xffd400 } }] },
     ],
     tracks: [
       // spinner：authored 自轉

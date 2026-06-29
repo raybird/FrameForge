@@ -20,10 +20,23 @@ function colorForId(id: string): THREE.Color {
   return c;
 }
 
+/**
+ * 顏色解析優先序：
+ *   1. 任一 component 的 data.color（number 如 0xffd400，或 CSS 字串如 'gold'）
+ *   2. 退回由 id 雜湊的穩定顏色
+ */
+export function colorForEntity(entity: Entity): THREE.Color {
+  for (const c of entity.components) {
+    const col = c.data.color;
+    if (typeof col === 'number' || typeof col === 'string') return new THREE.Color(col);
+  }
+  return colorForId(entity.id);
+}
+
 export const defaultObjectFactory: ObjectFactory = (entity) => {
   const geometry = new THREE.BoxGeometry(1, 1, 1);
   const material = new THREE.MeshStandardMaterial({
-    color: colorForId(entity.id),
+    color: colorForEntity(entity),
     transparent: true,
   });
   const mesh = new THREE.Mesh(geometry, material);
