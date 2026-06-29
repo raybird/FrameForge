@@ -1,0 +1,68 @@
+import { Component, inject } from '@angular/core';
+import { StudioStore } from './studio-store';
+
+@Component({
+  selector: 'ff-transport',
+  template: `
+    <div class="transport">
+      <button (click)="store.togglePlay()">{{ store.playing() ? '⏸' : '▶' }}</button>
+      <select (change)="onSpeed($event)" title="速度">
+        <option value="0.5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="2">2×</option>
+      </select>
+      <input
+        type="range"
+        min="0"
+        [max]="store.durationTicks"
+        [value]="store.tick()"
+        (input)="onSeek($event)"
+      />
+      <span class="time">tick {{ store.tick() }} / {{ seconds() }}s</span>
+      <button (click)="store.reset()" title="清除錄製">⟲ 清除</button>
+    </div>
+  `,
+  styles: [
+    `
+      .transport {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 4px;
+      }
+      button,
+      select {
+        background: #1c1c22;
+        color: #e6e6ea;
+        border: 1px solid #33333a;
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+      input[type='range'] {
+        flex: 1;
+      }
+      .time {
+        font-variant-numeric: tabular-nums;
+        min-width: 120px;
+        text-align: right;
+        opacity: 0.85;
+      }
+    `,
+  ],
+})
+export class TransportComponent {
+  readonly store = inject(StudioStore);
+
+  seconds(): string {
+    return (this.store.tick() / this.store.tickRate).toFixed(2);
+  }
+
+  onSpeed(e: Event): void {
+    this.store.setSpeed(Number((e.target as HTMLSelectElement).value));
+  }
+
+  onSeek(e: Event): void {
+    this.store.seek(Number((e.target as HTMLInputElement).value));
+  }
+}
