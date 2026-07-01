@@ -3,7 +3,13 @@ import type { SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
 import { ControllerRegistry, KinematicController, ReplaySession } from '@frameforge/engine-core';
 import type { TimelinePlayer } from '@frameforge/engine-three';
 import { exportToMp4, isWebCodecsSupported } from '@frameforge/engine-export';
-import { DURATION, HERO_ID, SEED, buildTimeline } from './scene-data';
+import { validateTimeline, type ValidationError } from '@frameforge/scene-schema';
+import { HERO_ID, SEED, buildTimeline } from './scene-data';
+
+export interface LoadOutcome {
+  ok: boolean;
+  errors: ValidationError[];
+}
 
 /**
  * StudioStore：Studio 的單一狀態源。
@@ -12,14 +18,21 @@ import { DURATION, HERO_ID, SEED, buildTimeline } from './scene-data';
  */
 @Injectable({ providedIn: 'root' })
 export class StudioStore {
-  readonly timeline: SceneTimeline = buildTimeline();
-  readonly durationTicks = this.timeline.durationTicks;
-  readonly tickRate = this.timeline.tickRate;
+  /** 目前作用中的場景（可換）。signal，讓 scene-tree 等反應式更新。 */
+  readonly timeline = signal<SceneTimeline>(buildTimeline());
+  get durationTicks(): number {
+    return this.timeline().durationTicks;
+  }
+  get tickRate(): number {
+    return this.timeline().tickRate;
+  }
 
   private readonly registry = new ControllerRegistry().register(KinematicController);
   private session = this.newSession();
   private player: TimelinePlayer | null = null;
   private canvas: HTMLCanvasElement | null = null;
+  /** Viewport 註冊的重建器：換場景時重建 adapters/player。 */
+  private rebuild: ((timeline: SceneTimeline) => void) | null = null;
 
   readonly tick = signal<Tick>(0);
   readonly playing = signal(false);
@@ -29,7 +42,7 @@ export class StudioStore {
   readonly exportProgress = signal(0);
 
   private newSession(): ReplaySession {
-    return new ReplaySession(this.timeline, {
+    return new ReplaySession(this.timeline(), {
       registry: this.registry,
       seed: SEED,
       snapshotInterval: 60,
@@ -54,6 +67,47 @@ export class StudioStore {
     this.canvas = canvas;
     this.tick.set(p.scheduler.tick);
     this.playing.set(p.playing);
+  }
+
+  /** Viewport 在建立 Stage 後註冊；換場景時用來重建 adapters/player。 */
+  registerRebuild(fn: (timeline: SceneTimeline) => void): void {
+    this.rebuild = fn;
+  }
+
+  /**
+   * 從 JSON 字串載入場景：先過 scene-schema 驗證，通過才換場景。
+   * 回傳的 errors 可直接顯示（也正是可回餵 LLM 修正的訊息）。
+   */
+  loadTimelineText(text: string): LoadOutcome {
+    let json: unknown;
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      return {
+        ok: false,
+        errors: [{ path: '(json)', message: `JSON 解析失敗：${(e as Error).message}` }],
+      };
+    }
+    const result = validateTimeline(json);
+    if (!result.ok) return { ok: false, errors: result.errors };
+    // scene-schema 契約比 shared-types 更嚴格，驗證通過後可安全視為 SceneTimeline。
+    this.applyTimeline(result.timeline as unknown as SceneTimeline);
+    return { ok: true, errors: [] };
+  }
+
+  /** 還原內建 demo 場景。 */
+  loadDefault(): void {
+    this.applyTimeline(buildTimeline());
+  }
+
+  private applyTimeline(timeline: SceneTimeline): void {
+    this.player?.pause();
+    this.timeline.set(timeline);
+    this.session = this.newSession();
+    this.tick.set(0);
+    this.playing.set(false);
+    this.selectedId.set(null);
+    this.rebuild?.(timeline);
   }
 
   readonly canExport = isWebCodecsSupported();

@@ -8,6 +8,7 @@ import {
   inject,
 } from '@angular/core';
 import { EntityAdapter, SceneAdapter, Stage, TimelinePlayer } from '@frameforge/engine-three';
+import type { SceneTimeline } from '@frameforge/shared-types';
 import { StudioStore } from './studio-store';
 
 const ARROWS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
@@ -33,26 +34,40 @@ const ARROWS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
 export class ViewportComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   private readonly store = inject(StudioStore);
+  private stage: Stage | null = null;
   private player: TimelinePlayer | null = null;
   private readonly held = new Set<string>();
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef.nativeElement;
-    const stage = new Stage({ canvas, width: 800, height: 520, background: 0x0b0b0e });
+    this.stage = new Stage({ canvas, width: 800, height: 520, background: 0x0b0b0e });
+    this.store.registerRebuild(this.buildPlayer);
+    this.buildPlayer(this.store.timeline());
+  }
+
+  /** 為指定 timeline 重建 adapters/player（初次掛載與換場景共用）。 */
+  private readonly buildPlayer = (timeline: SceneTimeline): void => {
+    const stage = this.stage;
+    if (!stage) return;
+    this.player?.unmount();
+    // 重置相機到預設視角；若場景含 Camera，SceneAdapter 會在 seek 時覆寫。
+    stage.camera.position.set(0, 6, 14);
+    stage.camera.lookAt(0, 0, 0);
     const adapters = [
       new SceneAdapter(stage.camera),
-      new EntityAdapter(stage.scene, this.store.timeline.entities),
+      new EntityAdapter(stage.scene, timeline.entities),
     ];
-    this.player = new TimelinePlayer(this.store.timeline, stage, adapters, {
+    this.player = new TimelinePlayer(timeline, stage, adapters, {
       evaluateAt: this.store.evaluateAt,
       onRender: this.store.onRender,
     });
     this.player.mount();
-    this.store.attachPlayer(this.player, canvas);
-  }
+    this.store.attachPlayer(this.player, this.canvasRef.nativeElement);
+  };
 
   ngOnDestroy(): void {
     this.player?.unmount();
+    this.stage?.dispose();
   }
 
   private direction(): { dx: number; dy: number } {

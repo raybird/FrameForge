@@ -1,12 +1,19 @@
 import { Component } from '@angular/core';
 import { ViewportComponent } from './viewport';
 import { SceneTreeComponent } from './scene-tree';
+import { SceneLoaderComponent } from './scene-loader';
 import { TransportComponent } from './transport';
 import { InspectorComponent } from './inspector';
 
 @Component({
   selector: 'app-root',
-  imports: [ViewportComponent, SceneTreeComponent, TransportComponent, InspectorComponent],
+  imports: [
+    ViewportComponent,
+    SceneTreeComponent,
+    SceneLoaderComponent,
+    TransportComponent,
+    InspectorComponent,
+  ],
   template: `
     <div class="studio">
       <header class="topbar">
@@ -14,7 +21,7 @@ import { InspectorComponent } from './inspector';
         <span class="sub">錄製互動 → 倒帶 → 完美重播</span>
       </header>
       <main class="layout">
-        <aside class="left"><ff-scene-tree /></aside>
+        <aside class="left"><ff-scene-loader /><ff-scene-tree /></aside>
         <section class="center">
           <ff-viewport />
           <ff-transport />

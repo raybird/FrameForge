@@ -7,7 +7,7 @@ import { StudioStore } from './studio-store';
     <div class="panel">
       <h2>Scene</h2>
       <ul class="tree">
-        @for (e of entities; track e.id) {
+        @for (e of store.timeline().entities; track e.id) {
           <li [class.selected]="store.selectedId() === e.id" (click)="store.select(e.id)">
             <span class="name">{{ e.name }}</span>
             <span class="id">{{ e.id }}</span>
@@ -49,5 +49,4 @@ import { StudioStore } from './studio-store';
 })
 export class SceneTreeComponent {
   readonly store = inject(StudioStore);
-  readonly entities = this.store.timeline.entities;
 }

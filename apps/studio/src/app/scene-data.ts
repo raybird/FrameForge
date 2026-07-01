@@ -78,3 +78,70 @@ export function buildTimeline(): SceneTimeline {
     events: [],
   };
 }
+
+/**
+ * 一段「像 AI 會吐出」的 timeline JSON 字串，供 SceneLoader 的「載入範例」示範
+ * 「JSON → validateTimeline → 載入播放」的完整往返。純 authored（可任意 seek）。
+ */
+export function exampleTimelineJson(): string {
+  const scene = {
+    id: 'hello_scene',
+    name: 'Hello（load via JSON）',
+    tickRate: 60,
+    durationTicks: 240,
+    assets: [],
+    entities: [
+      {
+        id: 'ground',
+        name: 'Ground',
+        components: [
+          {
+            type: 'Transform',
+            data: { position: { x: 0, y: -1.2, z: 0 }, scale: { x: 14, y: 0.3, z: 14 }, color: 0x394a2f },
+          },
+        ],
+      },
+      {
+        id: 'orb',
+        name: 'Orb',
+        components: [
+          { type: 'Transform', data: { position: { x: -3, y: 0.6, z: 0 } } },
+          { type: 'Mesh', data: { shape: 'sphere', size: 1.2, color: 0x39d98a } },
+        ],
+      },
+      {
+        id: 'label',
+        name: 'Label',
+        components: [
+          { type: 'Transform', data: { position: { x: 0, y: 3, z: -2 } } },
+          { type: 'Text', data: { content: 'Loaded via JSON', fontSize: 72, color: '#39d98a' } },
+        ],
+      },
+    ],
+    tracks: [
+      {
+        id: 'tk_orb_x',
+        entityId: 'orb',
+        kind: 'authored',
+        target: 'transform.position',
+        keyframes: [
+          { tick: 0, value: { x: -3, y: 0.6, z: 0 } },
+          { tick: 120, value: { x: 3, y: 0.6, z: 0 }, easing: 'easeInOut' },
+          { tick: 240, value: { x: -3, y: 0.6, z: 0 }, easing: 'easeInOut' },
+        ],
+      },
+      {
+        id: 'tk_orb_spin',
+        entityId: 'orb',
+        kind: 'authored',
+        target: 'transform.rotation',
+        keyframes: [
+          { tick: 0, value: { x: 0, y: 0, z: 0 } },
+          { tick: 240, value: { x: 0, y: 6.28, z: 0 } },
+        ],
+      },
+    ],
+    events: [],
+  };
+  return JSON.stringify(scene, null, 2);
+}
