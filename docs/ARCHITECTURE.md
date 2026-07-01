@@ -13,6 +13,31 @@
 
 它**不是** emergent 物理遊戲引擎（那是被明確放棄的「路線乙」）。
 
+### 0.1 市場定位與差異化（2026-07-01 市場掃描）
+
+程式化/宣告式影片這條賽道到 2026 年中已相當擁擠。先認清邊界再開發，避免特性漂移回紅海。
+
+| 對手 | 佔據的角 | 與 FrameForge 的關係 |
+|---|---|---|
+| **Remotion** | 宣告式 `f(t)` + MP4，官方 MCP + Claude Skill，生態最大 | 🔴 正面紅海：純 authoring 影片產量拚不過，不正面對決 |
+| **HyperFrames**（HeyGen） | HTML/CSS→決定性 MP4、seekable、for agents | 本專案的**概念繆思**（見 §1），非追趕對象；差異在它是 2D DOM、無 3D 場景圖、無互動錄播 |
+| **Vercel JSON Render** | 宣告式 JSON→元件 registry→決定性投影、zod 驗證、內建 R3F 3D + Remotion 時間軸 | 🟠 **架構雙胞胎**：證明方向對，但它定位生成式 UI，不做影片匯出/互動錄播 |
+| **Revideo / Motion Canvas / Theatre.js** | 決定性量產 / 手工 2D 動畫 / Three 時間軸編輯器 | 🟡 各佔一角，皆純 authored |
+| **Pexo / Veo / Sora / Kling** | 擴散模型生成寫實素材 | ⚪ 互補，非同類 |
+
+**已被踩掉、不再算差異化的假設：**
+
+- 「用 MCP 接 AI 生成」——Remotion 已有官方 + 社群 MCP。（FrameForge 的 MCP 仍具體不同：schema 契約 + validate/compile 修正迴圈，非 docs-RAG 或素材生成；但「用 MCP 接生成」這個方向本身不再獨特。）
+- 「決定性 + seekable + MP4 + agent-native」——HyperFrames 已做全。
+
+**收斂後唯一未被佔據的護城河：**
+
+> **「錄下的互動」的決定性重播（遊戲 replay 式）× 3D 場景圖 × 逐幀匯出。**
+
+所有對手都是**純 authored**；唯獨 FrameForge 有 `session.recordEvent → 決定性 seek/重播`（engine-core 命脈②，見 §2.1 的 Interactive Segment）。這條**互動錄播**，是市場掃描後唯一沒被別人踩到的資產。
+
+**開發護欄：** 特性優先序一律偏向**強化互動錄播 + 3D + 匯出**這條線；對外一句話講成「**可互動、可錄播的 3D 場景合成器**」，而非「又一個程式化影片工具」。任何把資源投進「跟 Remotion 拚純 authoring 影片產量」的方向，預設不做。
+
 ---
 
 ## 1. 設計決策的根源：借用 HyperFrames，但要劃清邊界
