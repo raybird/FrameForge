@@ -69,7 +69,7 @@ describe('defaultObjectFactory — 依 component 型別建立物件', () => {
   });
 });
 
-describe('createObjectFactory — 貼圖 hook', () => {
+describe('createObjectFactory — asset resolver hook', () => {
   it('Sprite 有 assetId 且 resolveTexture 命中 → 貼圖並轉白底', () => {
     const texture = new THREE.Texture();
     const factory = createObjectFactory({ resolveTexture: (id) => (id === 'hero_png' ? texture : undefined) });
@@ -77,5 +77,22 @@ describe('createObjectFactory — 貼圖 hook', () => {
     const mat = obj.material as THREE.MeshBasicMaterial;
     expect(mat.map).toBe(texture);
     expect(mat.color.getHex()).toBe(0xffffff);
+  });
+
+  it('Mesh 有 assetId 且 resolveModel 命中 → clone 模型（非 primitive box）', () => {
+    const root = new THREE.Group();
+    root.add(new THREE.Mesh(new THREE.SphereGeometry(1), new THREE.MeshStandardMaterial()));
+    const factory = createObjectFactory({ resolveModel: (id) => (id === 'ship' ? root : undefined) });
+    const obj = factory(entity([{ type: 'Mesh', data: { assetId: 'ship' } }], 'm')) as THREE.Object3D;
+    expect(obj).not.toBe(root); // 是 clone
+    expect(obj.children).toHaveLength(1);
+    expect(obj.name).toBe('m');
+    expect((obj as THREE.Mesh).geometry).toBeUndefined(); // Group，非 primitive mesh
+  });
+
+  it('Mesh 有 assetId 但 resolveModel 未命中 → 退回 primitive 幾何', () => {
+    const factory = createObjectFactory({ resolveModel: () => undefined });
+    const obj = factory(entity([{ type: 'Mesh', data: { assetId: 'missing', shape: 'sphere' } }])) as THREE.Mesh;
+    expect(obj.geometry).toBeInstanceOf(THREE.SphereGeometry);
   });
 });

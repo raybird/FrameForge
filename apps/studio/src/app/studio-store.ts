@@ -1,7 +1,13 @@
 import { Injectable, signal } from '@angular/core';
 import type { SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
 import { ControllerRegistry, KinematicController, ReplaySession } from '@frameforge/engine-core';
-import type { TimelinePlayer } from '@frameforge/engine-three';
+import {
+  createObjectFactory,
+  preloadAssets,
+  type ObjectFactory,
+  type ObjectFactoryContext,
+  type TimelinePlayer,
+} from '@frameforge/engine-three';
 import { exportToMp4, isWebCodecsSupported } from '@frameforge/engine-export';
 import { loadScene, type ValidationError } from '@frameforge/scene-schema';
 import { HERO_ID, SEED, buildTimeline } from './scene-data';
@@ -33,6 +39,13 @@ export class StudioStore {
   private canvas: HTMLCanvasElement | null = null;
   /** Viewport 註冊的重建器：換場景時重建 adapters/player。 */
   private rebuild: ((timeline: SceneTimeline) => void) | null = null;
+  /** 目前場景已預載 asset 的 object-factory context（貼圖 / 模型解析）。 */
+  private assetCtx: ObjectFactoryContext = {};
+
+  /** 供 Viewport 建 EntityAdapter：綁定目前場景已預載 asset 的工廠。 */
+  objectFactory(): ObjectFactory {
+    return createObjectFactory(this.assetCtx);
+  }
 
   readonly tick = signal<Tick>(0);
   readonly playing = signal(false);
@@ -40,6 +53,8 @@ export class StudioStore {
   readonly world = signal<WorldState | null>(null);
   readonly exporting = signal(false);
   readonly exportProgress = signal(0);
+  /** 換場景時預載 asset 的狀態。 */
+  readonly loading = signal(false);
 
   private newSession(): ReplaySession {
     return new ReplaySession(this.timeline(), {
@@ -78,7 +93,7 @@ export class StudioStore {
    * 從 JSON 字串載入場景：先過 scene-schema 驗證，通過才換場景。
    * 回傳的 errors 可直接顯示（也正是可回餵 LLM 修正的訊息）。
    */
-  loadTimelineText(text: string): LoadOutcome {
+  async loadTimelineText(text: string): Promise<LoadOutcome> {
     let json: unknown;
     try {
       json = JSON.parse(text);
@@ -92,17 +107,25 @@ export class StudioStore {
     const result = loadScene(json);
     if (!result.ok) return { ok: false, errors: result.errors };
     // scene-schema 契約比 shared-types 更嚴格，驗證通過後可安全視為 SceneTimeline。
-    this.applyTimeline(result.timeline as unknown as SceneTimeline);
+    await this.applyTimeline(result.timeline as unknown as SceneTimeline);
     return { ok: true, errors: [] };
   }
 
   /** 還原內建 demo 場景。 */
-  loadDefault(): void {
-    this.applyTimeline(buildTimeline());
+  async loadDefault(): Promise<void> {
+    await this.applyTimeline(buildTimeline());
   }
 
-  private applyTimeline(timeline: SceneTimeline): void {
+  private async applyTimeline(timeline: SceneTimeline): Promise<void> {
     this.player?.pause();
+    // 決定性：換場景前先預載全部 asset，之後 seek/匯出都同步從 store 讀。
+    this.loading.set(true);
+    try {
+      const store = await preloadAssets(timeline.assets);
+      this.assetCtx = store.factoryContext();
+    } finally {
+      this.loading.set(false);
+    }
     this.timeline.set(timeline);
     this.session = this.newSession();
     this.tick.set(0);

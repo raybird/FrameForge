@@ -11,6 +11,9 @@ export type { StageOptions } from './stage';
 export { defaultObjectFactory, createObjectFactory, colorForEntity } from './object-factory';
 export type { ObjectFactory, ObjectFactoryContext } from './object-factory';
 
+export { AssetStore, preloadAssets, defaultAssetLoaders } from './assets';
+export type { AssetLoaders } from './assets';
+
 export { EntityAdapter, applyEntityState } from './adapters/entity-adapter';
 export { SceneAdapter } from './adapters/scene-adapter';
 export type { SceneAdapterOptions } from './adapters/scene-adapter';

@@ -55,7 +55,7 @@ export class ViewportComponent implements AfterViewInit, OnDestroy {
     stage.camera.lookAt(0, 0, 0);
     const adapters = [
       new SceneAdapter(stage.camera),
-      new EntityAdapter(stage.scene, timeline.entities),
+      new EntityAdapter(stage.scene, timeline.entities, this.store.objectFactory()),
     ];
     this.player = new TimelinePlayer(timeline, stage, adapters, {
       evaluateAt: this.store.evaluateAt,

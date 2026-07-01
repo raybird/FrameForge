@@ -118,18 +118,18 @@ export class SceneLoaderComponent {
     return (e.target as HTMLTextAreaElement).value;
   }
 
-  load(): void {
-    this.apply(this.store.loadTimelineText(this.text()));
+  async load(): Promise<void> {
+    this.apply(await this.store.loadTimelineText(this.text()));
   }
 
-  loadExample(): void {
+  async loadExample(): Promise<void> {
     const json = exampleTimelineJson();
     this.text.set(json);
-    this.apply(this.store.loadTimelineText(json));
+    this.apply(await this.store.loadTimelineText(json));
   }
 
-  reset(): void {
-    this.store.loadDefault();
+  async reset(): Promise<void> {
+    await this.store.loadDefault();
     this.errors.set([]);
     this.status.set({ ok: true, message: '已還原 demo 場景 ✓' });
   }
@@ -137,9 +137,9 @@ export class SceneLoaderComponent {
   onFile(e: Event): void {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (!file) return;
-    file.text().then((t) => {
+    file.text().then(async (t) => {
       this.text.set(t);
-      this.apply(this.store.loadTimelineText(t));
+      this.apply(await this.store.loadTimelineText(t));
     });
   }
 

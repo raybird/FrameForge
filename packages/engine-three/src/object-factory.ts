@@ -21,6 +21,8 @@ import type { ComponentDef, Entity, JsonValue } from '@frameforge/shared-types';
 export interface ObjectFactoryContext {
   /** 由 assetId 取得已載入貼圖。無 asset pipeline 時可不提供 → Sprite 退回純色。 */
   resolveTexture?: (assetId: string) => THREE.Texture | undefined;
+  /** 由 assetId 取得已載入模型（gltf/glb 的 scene）。無則 Mesh 退回 primitive 幾何。 */
+  resolveModel?: (assetId: string) => THREE.Object3D | undefined;
 }
 
 /** 回傳 null 代表「此 entity 不在場景樹上」（例：Camera）。 */
@@ -77,7 +79,7 @@ function build(entity: Entity, ctx: ObjectFactoryContext): THREE.Object3D | null
     case 'Camera':
       return null;
     case 'Mesh':
-      return buildMesh(entity);
+      return buildMesh(entity, ctx);
     case 'Sprite':
       return buildSprite(entity, ctx);
     case 'Text':
@@ -98,8 +100,14 @@ function primaryVisualType(entity: Entity): (typeof VISUAL_PRECEDENCE)[number] |
 // 各型別
 // ─────────────────────────────────────────────────────────────
 
-function buildMesh(entity: Entity): THREE.Mesh {
+function buildMesh(entity: Entity, ctx: ObjectFactoryContext): THREE.Object3D {
   const data = dataOf(entity, 'Mesh');
+
+  // 有載入的模型（gltf/glb）→ clone 一份（可多實體共用）。
+  const assetId = str(data.assetId, '');
+  const model = assetId ? ctx.resolveModel?.(assetId) : undefined;
+  if (model) return model.clone(true);
+
   const shape = str(data.shape, 'box');
   const size = num(data.size, 1);
   const geometry =

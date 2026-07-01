@@ -79,9 +79,14 @@ export function buildTimeline(): SceneTimeline {
   };
 }
 
+/** 內嵌的 16x16 PNG（黃/深格紋 + 白框），示範 asset pipeline 載入真貼圖。 */
+const SAMPLE_TEXTURE =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR4nGP4TyFgAJNXGOBYRkYJBSPLocsPIgOI1YAhP4wMGPhYGHgDBj4WKI9GCgAAPmKHpVJ4Ju0AAAAASUVORK5CYII=';
+
 /**
  * 一段「像 AI 會吐出」的 **authoring 形式** JSON（秒 / 角度 / camera lookAt），供 SceneLoader
  * 的「載入範例」示範完整往返：authoring JSON → loadScene 編譯驗證 → 載入播放。純 authored。
+ * 含一個引用 png asset 的 Sprite，示範 asset pipeline 載入真貼圖。
  */
 export function exampleTimelineJson(): string {
   const scene = {
@@ -89,7 +94,7 @@ export function exampleTimelineJson(): string {
     name: 'Hello（authoring form）',
     tickRate: 60,
     durationSeconds: 4,
-    assets: [],
+    assets: [{ id: 'ff_tex', type: 'png', url: SAMPLE_TEXTURE }],
     entities: [
       {
         id: 'cam',
@@ -124,6 +129,15 @@ export function exampleTimelineJson(): string {
         components: [
           { type: 'Transform', data: { position: { x: 0, y: 3, z: -2 } } },
           { type: 'Text', data: { content: 'authoring form', fontSize: 72, color: '#39d98a' } },
+        ],
+      },
+      {
+        id: 'logo',
+        name: 'Logo',
+        // Sprite 引用 png asset → asset pipeline 載入後顯示真貼圖。
+        components: [
+          { type: 'Transform', data: { position: { x: 4, y: 1.4, z: 0 } } },
+          { type: 'Sprite', data: { assetId: 'ff_tex', width: 2, height: 2 } },
         ],
       },
     ],
