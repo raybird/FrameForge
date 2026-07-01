@@ -1,0 +1,1271 @@
+{
+  "id": "cretaceous_impact",
+  "name": "白堊紀末日：隕石撞擊與恐龍滅絕",
+  "tickRate": 60,
+  "durationTicks": 840,
+  "entities": [
+    {
+      "id": "camera",
+      "name": "Camera",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 5,
+              "z": 24
+            },
+            "rotation": {
+              "x": -0.16514867741462683,
+              "y": 0,
+              "z": 0
+            }
+          }
+        },
+        {
+          "type": "Camera",
+          "data": {
+            "projection": "perspective",
+            "fov": 55,
+            "near": 0.1,
+            "far": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "ground",
+      "name": "Ground",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": -2.2,
+              "z": 0
+            },
+            "scale": {
+              "x": 30,
+              "y": 0.6,
+              "z": 18
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#6b4f2a"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ridge_l",
+      "name": "Ridge Left",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": -9,
+              "y": -0.6,
+              "z": -6
+            },
+            "scale": {
+              "x": 7,
+              "y": 4.2,
+              "z": 3
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#4a3720"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ridge_r",
+      "name": "Ridge Right",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 9,
+              "y": -0.2,
+              "z": -7
+            },
+            "scale": {
+              "x": 8,
+              "y": 5.2,
+              "z": 3
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#40311d"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dino1",
+      "name": "Dino 1",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": -5,
+              "y": -0.6,
+              "z": 1
+            },
+            "scale": {
+              "x": 1.2,
+              "y": 2.6,
+              "z": 0.9
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#3f7d3a"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dino2",
+      "name": "Dino 2",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": -1.5,
+              "y": -0.6,
+              "z": 2.2
+            },
+            "scale": {
+              "x": 1,
+              "y": 2.2,
+              "z": 0.8
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#4f8f3f"
+          }
+        }
+      ]
+    },
+    {
+      "id": "dino3",
+      "name": "Dino 3",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 3,
+              "y": -0.6,
+              "z": 0.5
+            },
+            "scale": {
+              "x": 1.35,
+              "y": 2.9,
+              "z": 1
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#357032"
+          }
+        }
+      ]
+    },
+    {
+      "id": "meteor",
+      "name": "Meteor",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 16,
+              "y": 15,
+              "z": -5
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#ff5a1e",
+            "size": 1.1
+          }
+        }
+      ]
+    },
+    {
+      "id": "meteorGlow",
+      "name": "Meteor Glow",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 16.8,
+              "y": 15.8,
+              "z": -5.5
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#ffb066",
+            "size": 2.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "flash",
+      "name": "Impact Flash",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": -1.2,
+              "z": 0
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#fff3c9",
+            "size": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "shockwave",
+      "name": "Shockwave",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": -1.85,
+              "z": 0
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#ff9a3c"
+          }
+        }
+      ]
+    },
+    {
+      "id": "ash",
+      "name": "Ash / Nuclear Winter",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 3,
+              "z": 11
+            },
+            "scale": {
+              "x": 46,
+              "y": 30,
+              "z": 0.3
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "box",
+            "color": "#0a0805"
+          }
+        }
+      ]
+    },
+    {
+      "id": "title",
+      "name": "Title",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 7.5,
+              "z": 6
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "白堊紀・晚期",
+            "fontSize": 84,
+            "color": "#e8e8ef"
+          }
+        }
+      ]
+    },
+    {
+      "id": "subtitle",
+      "name": "Subtitle",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 6.2,
+              "z": 6
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "6600 萬年前 · 一顆小行星正在接近",
+            "fontSize": 40,
+            "color": "#a9b0bd"
+          }
+        }
+      ]
+    },
+    {
+      "id": "endText",
+      "name": "End Title",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 3.4,
+              "z": 13
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "恐龍滅絕",
+            "fontSize": 110,
+            "color": "#ffcaa6"
+          }
+        }
+      ]
+    },
+    {
+      "id": "endText2",
+      "name": "End Subtitle",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 1.8,
+              "z": 13
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "白堊紀–古近紀滅絕事件 · K–Pg",
+            "fontSize": 40,
+            "color": "#c9a58f"
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "tracks": [
+    {
+      "id": "cam_pos",
+      "entityId": "camera",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": {
+            "x": 0,
+            "y": 5,
+            "z": 24
+          }
+        },
+        {
+          "tick": 180,
+          "value": {
+            "x": 0,
+            "y": 5,
+            "z": 22
+          },
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 360,
+          "value": {
+            "x": 0,
+            "y": 4.6,
+            "z": 20
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 366,
+          "value": {
+            "x": 0.5,
+            "y": 4.9,
+            "z": 20
+          }
+        },
+        {
+          "tick": 372,
+          "value": {
+            "x": -0.5,
+            "y": 4.4,
+            "z": 20
+          }
+        },
+        {
+          "tick": 378,
+          "value": {
+            "x": 0.35,
+            "y": 4.8,
+            "z": 20
+          }
+        },
+        {
+          "tick": 384,
+          "value": {
+            "x": -0.25,
+            "y": 4.5,
+            "z": 20
+          }
+        },
+        {
+          "tick": 390,
+          "value": {
+            "x": 0.12,
+            "y": 4.75,
+            "z": 20
+          }
+        },
+        {
+          "tick": 402,
+          "value": {
+            "x": 0,
+            "y": 4.7,
+            "z": 20
+          },
+          "easing": "easeOut"
+        },
+        {
+          "tick": 600,
+          "value": {
+            "x": 0,
+            "y": 4.5,
+            "z": 21
+          }
+        },
+        {
+          "tick": 840,
+          "value": {
+            "x": 0,
+            "y": 4.3,
+            "z": 22
+          },
+          "easing": "easeInOut"
+        }
+      ]
+    },
+    {
+      "id": "met_pos",
+      "entityId": "meteor",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": {
+            "x": 16,
+            "y": 15,
+            "z": -5
+          }
+        },
+        {
+          "tick": 180,
+          "value": {
+            "x": 11,
+            "y": 10,
+            "z": -3.5
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 300,
+          "value": {
+            "x": 6,
+            "y": 4,
+            "z": -1.5
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 360,
+          "value": {
+            "x": 0,
+            "y": -1.4,
+            "z": 0
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "met_scl",
+      "entityId": "meteor",
+      "kind": "authored",
+      "target": "transform.scale",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": {
+            "x": 0.7,
+            "y": 0.7,
+            "z": 0.7
+          }
+        },
+        {
+          "tick": 360,
+          "value": {
+            "x": 1.5,
+            "y": 1.5,
+            "z": 1.5
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "met_rot",
+      "entityId": "meteor",
+      "kind": "authored",
+      "target": "transform.rotation",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        {
+          "tick": 360,
+          "value": {
+            "x": 15.707963267948966,
+            "y": 9.42477796076938,
+            "z": 0
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "met_op",
+      "entityId": "meteor",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 1
+        },
+        {
+          "tick": 360,
+          "value": 1
+        },
+        {
+          "tick": 369,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "glow_pos",
+      "entityId": "meteorGlow",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": {
+            "x": 16.8,
+            "y": 15.8,
+            "z": -5.5
+          }
+        },
+        {
+          "tick": 180,
+          "value": {
+            "x": 11.6,
+            "y": 10.6,
+            "z": -3.8
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 300,
+          "value": {
+            "x": 6.5,
+            "y": 4.5,
+            "z": -1.7
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 360,
+          "value": {
+            "x": 0.3,
+            "y": -1.1,
+            "z": 0.2
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "glow_scl",
+      "entityId": "meteorGlow",
+      "kind": "authored",
+      "target": "transform.scale",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": {
+            "x": 0.9,
+            "y": 0.9,
+            "z": 0.9
+          }
+        },
+        {
+          "tick": 360,
+          "value": {
+            "x": 2,
+            "y": 2,
+            "z": 2
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "glow_op",
+      "entityId": "meteorGlow",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0.35
+        },
+        {
+          "tick": 360,
+          "value": 0.35
+        },
+        {
+          "tick": 369,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "flash_scl",
+      "entityId": "flash",
+      "kind": "authored",
+      "target": "transform.scale",
+      "keyframes": [
+        {
+          "tick": 360,
+          "value": {
+            "x": 0.05,
+            "y": 0.05,
+            "z": 0.05
+          }
+        },
+        {
+          "tick": 369,
+          "value": {
+            "x": 18,
+            "y": 18,
+            "z": 18
+          },
+          "easing": "easeOut"
+        },
+        {
+          "tick": 420,
+          "value": {
+            "x": 6,
+            "y": 6,
+            "z": 6
+          },
+          "easing": "easeOut"
+        }
+      ]
+    },
+    {
+      "id": "flash_op",
+      "entityId": "flash",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0
+        },
+        {
+          "tick": 360,
+          "value": 0
+        },
+        {
+          "tick": 369,
+          "value": 1,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 432,
+          "value": 0.3
+        },
+        {
+          "tick": 540,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "shock_scl",
+      "entityId": "shockwave",
+      "kind": "authored",
+      "target": "transform.scale",
+      "keyframes": [
+        {
+          "tick": 360,
+          "value": {
+            "x": 0.2,
+            "y": 0.06,
+            "z": 0.2
+          }
+        },
+        {
+          "tick": 369,
+          "value": {
+            "x": 2,
+            "y": 0.06,
+            "z": 2
+          }
+        },
+        {
+          "tick": 456,
+          "value": {
+            "x": 34,
+            "y": 0.06,
+            "z": 34
+          },
+          "easing": "easeOut"
+        }
+      ]
+    },
+    {
+      "id": "shock_op",
+      "entityId": "shockwave",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0
+        },
+        {
+          "tick": 360,
+          "value": 0
+        },
+        {
+          "tick": 369,
+          "value": 0.85,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 456,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "dino1_rot",
+      "entityId": "dino1",
+      "kind": "authored",
+      "target": "transform.rotation",
+      "keyframes": [
+        {
+          "tick": 360,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        {
+          "tick": 366,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": -0.06981317007977318
+          }
+        },
+        {
+          "tick": 372,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0.06981317007977318
+          }
+        },
+        {
+          "tick": 381,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        {
+          "tick": 438,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 1.4311699866353502
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "dino1_pos",
+      "entityId": "dino1",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 381,
+          "value": {
+            "x": -5,
+            "y": -0.6,
+            "z": 1
+          }
+        },
+        {
+          "tick": 438,
+          "value": {
+            "x": -6.6,
+            "y": -1.5,
+            "z": 1
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "dino1_op",
+      "entityId": "dino1",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 1
+        },
+        {
+          "tick": 480,
+          "value": 1
+        },
+        {
+          "tick": 690,
+          "value": 0.12
+        }
+      ]
+    },
+    {
+      "id": "dino2_rot",
+      "entityId": "dino2",
+      "kind": "authored",
+      "target": "transform.rotation",
+      "keyframes": [
+        {
+          "tick": 360,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        {
+          "tick": 367,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0.05235987755982989
+          }
+        },
+        {
+          "tick": 374,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": -0.05235987755982989
+          }
+        },
+        {
+          "tick": 384,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        {
+          "tick": 450,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 1.2217304763960306
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "dino2_pos",
+      "entityId": "dino2",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 384,
+          "value": {
+            "x": -1.5,
+            "y": -0.6,
+            "z": 2.2
+          }
+        },
+        {
+          "tick": 450,
+          "value": {
+            "x": -2.4,
+            "y": -1.5,
+            "z": 2.2
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "dino2_op",
+      "entityId": "dino2",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 1
+        },
+        {
+          "tick": 492,
+          "value": 1
+        },
+        {
+          "tick": 708,
+          "value": 0.12
+        }
+      ]
+    },
+    {
+      "id": "dino3_rot",
+      "entityId": "dino3",
+      "kind": "authored",
+      "target": "transform.rotation",
+      "keyframes": [
+        {
+          "tick": 360,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        {
+          "tick": 366,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0.06981317007977318
+          }
+        },
+        {
+          "tick": 373,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": -0.06981317007977318
+          }
+        },
+        {
+          "tick": 384,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        {
+          "tick": 432,
+          "value": {
+            "x": 0,
+            "y": 0,
+            "z": -1.4660765716752369
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "dino3_pos",
+      "entityId": "dino3",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 384,
+          "value": {
+            "x": 3,
+            "y": -0.6,
+            "z": 0.5
+          }
+        },
+        {
+          "tick": 432,
+          "value": {
+            "x": 4.6,
+            "y": -1.5,
+            "z": 0.5
+          },
+          "easing": "easeIn"
+        }
+      ]
+    },
+    {
+      "id": "dino3_op",
+      "entityId": "dino3",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 1
+        },
+        {
+          "tick": 468,
+          "value": 1
+        },
+        {
+          "tick": 672,
+          "value": 0.12
+        }
+      ]
+    },
+    {
+      "id": "ash_op",
+      "entityId": "ash",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0
+        },
+        {
+          "tick": 390,
+          "value": 0
+        },
+        {
+          "tick": 510,
+          "value": 0.5,
+          "easing": "easeIn"
+        },
+        {
+          "tick": 660,
+          "value": 0.86,
+          "easing": "easeIn"
+        },
+        {
+          "tick": 840,
+          "value": 0.86
+        }
+      ]
+    },
+    {
+      "id": "title_op",
+      "entityId": "title",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0
+        },
+        {
+          "tick": 36,
+          "value": 0
+        },
+        {
+          "tick": 84,
+          "value": 1,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 252,
+          "value": 1
+        },
+        {
+          "tick": 312,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "subtitle_op",
+      "entityId": "subtitle",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0
+        },
+        {
+          "tick": 60,
+          "value": 0
+        },
+        {
+          "tick": 108,
+          "value": 1,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 252,
+          "value": 1
+        },
+        {
+          "tick": 312,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "end_op",
+      "entityId": "endText",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0
+        },
+        {
+          "tick": 480,
+          "value": 0
+        },
+        {
+          "tick": 576,
+          "value": 1,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 840,
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "end2_op",
+      "entityId": "endText2",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0
+        },
+        {
+          "tick": 552,
+          "value": 0
+        },
+        {
+          "tick": 636,
+          "value": 1,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 840,
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "events": []
+}
