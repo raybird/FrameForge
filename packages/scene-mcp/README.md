@@ -8,11 +8,13 @@ FrameForge 場景的 **MCP 工具伺服器**。讓 Claude Code / Claude Desktop 
 
 | 工具 | 用途 |
 |---|---|
-| `get_scene_schema` | 回傳 SceneTimeline 的 JSON Schema 與撰寫指南（產生前先讀） |
-| `validate_scene` | 驗證一份 timeline（物件或 JSON 字串），回傳可據以修正的錯誤清單 |
-| `save_scene` | 驗證通過才寫成 JSON 檔（給 Studio「載入場景」用），未通過不寫 |
+| `get_scene_schema` | 回傳 **authoring 形式**（秒 / 角度 / camera lookAt）的 JSON Schema 與撰寫指南（產生前先讀） |
+| `compile_scene` | 把 authoring 形式編譯成可載入的 canonical timeline（並驗證），回傳 canonical JSON 或錯誤 |
+| `validate_scene` | 驗證一份場景（authoring 或 canonical、物件或字串皆可），回傳可據以修正的錯誤 |
+| `save_scene` | 驗證/編譯通過才寫成 JSON 檔（給 Studio「載入場景」用），未通過不寫 |
 
-驗證由 `@frameforge/scene-schema` 的 `validateTimeline` 負責（zod + 交叉引用）。
+驗證與編譯由 `@frameforge/scene-schema` 負責：`validateTimeline`（zod + 交叉引用）、
+`compileScene`（authoring → canonical：秒→tick、角度→弧度、lookAt→euler）。
 
 ## 啟動
 
@@ -51,6 +53,6 @@ npm start           # = tsx src/server.ts（stdio）
 ## 典型流程
 
 1. 對 agent 說：「用 FrameForge 做一個 X 場景」。
-2. agent 呼叫 `get_scene_schema` 了解格式 → 產生 timeline JSON。
-3. agent 呼叫 `validate_scene` → 未過就依回傳錯誤修正、再驗，直到通過。
-4. （選）`save_scene` 寫檔，或把 JSON 貼進 Studio 的「載入場景」播放、匯出 MP4。
+2. agent 呼叫 `get_scene_schema` 了解 authoring 格式 → 用秒/角度/lookAt 產生 JSON。
+3. agent 呼叫 `compile_scene` → 未過就依回傳錯誤修正、再試，直到通過並拿到 canonical JSON。
+4. （選）`save_scene` 寫檔，或把 JSON 貼進 Studio 的「載入場景」播放、匯出 MP4（Studio 也直接吃 authoring 形式）。

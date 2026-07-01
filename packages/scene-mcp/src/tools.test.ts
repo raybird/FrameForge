@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { schemaText, validateScene, saveScene } from './tools';
+import { schemaText, validateScene, compileToCanonical, saveScene } from './tools';
 
 const VALID = {
   id: 's',
@@ -25,11 +25,31 @@ const VALID = {
 // 同一份，但 track 參照不存在的 entity。
 const INVALID = { ...VALID, tracks: [{ ...VALID.tracks[0], entityId: 'ghost' }] };
 
-describe('schemaText', () => {
-  it('是可解析的 JSON Schema，含頂層欄位', () => {
+// authoring 形式（秒 / 角度 / camera lookAt）。
+const AUTHORED = {
+  id: 'a',
+  name: 'A',
+  durationSeconds: 4,
+  entities: [
+    {
+      id: 'cam',
+      name: 'Cam',
+      components: [
+        { type: 'Transform', data: { position: { x: 0, y: 6, z: 14 } } },
+        { type: 'Camera', data: { fov: 50, lookAt: { x: 0, y: 0, z: 0 } } },
+      ],
+    },
+    { id: 'orb', name: 'Orb', components: [{ type: 'Mesh', data: { shape: 'sphere' } }] },
+  ],
+  tracks: [],
+  events: [],
+};
+
+describe('schemaText（authoring 形式）', () => {
+  it('是可解析的 JSON Schema，含 durationSeconds 等頂層欄位', () => {
     const schema = JSON.parse(schemaText());
     expect(schema.type).toBe('object');
-    for (const k of ['entities', 'tracks', 'events', 'durationTicks']) {
+    for (const k of ['entities', 'tracks', 'events', 'durationSeconds']) {
       expect(schema.properties).toHaveProperty(k);
     }
   });
@@ -59,6 +79,31 @@ describe('validateScene', () => {
     const r = validateScene('{ not json');
     expect(r.ok).toBe(false);
     expect(r.text).toContain('JSON 解析失敗');
+  });
+
+  it('也吃 authoring 形式（有 durationSeconds）', () => {
+    const r = validateScene(AUTHORED);
+    expect(r.ok).toBe(true);
+    // 已編譯成 canonical：4 秒 @60 → 240 ticks
+    expect(r.timeline?.durationTicks).toBe(240);
+  });
+});
+
+describe('compileToCanonical', () => {
+  it('authoring → canonical JSON（秒→tick、lookAt→旋轉）', () => {
+    const r = compileToCanonical(AUTHORED);
+    expect(r.ok).toBe(true);
+    const canonical = JSON.parse(r.canonicalJson!);
+    expect(canonical.durationTicks).toBe(240);
+    const cam = canonical.entities.find((e: { id: string }) => e.id === 'cam');
+    const transform = cam.components.find((c: { type: string }) => c.type === 'Transform');
+    expect(transform.data.rotation.x).toBeCloseTo(-Math.atan2(6, 14), 4);
+  });
+
+  it('不合法 authoring → 回報錯誤，無 canonicalJson', () => {
+    const r = compileToCanonical({ ...AUTHORED, durationSeconds: 0 });
+    expect(r.ok).toBe(false);
+    expect(r.canonicalJson).toBeUndefined();
   });
 });
 

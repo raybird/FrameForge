@@ -80,17 +80,26 @@ export function buildTimeline(): SceneTimeline {
 }
 
 /**
- * 一段「像 AI 會吐出」的 timeline JSON 字串，供 SceneLoader 的「載入範例」示範
- * 「JSON → validateTimeline → 載入播放」的完整往返。純 authored（可任意 seek）。
+ * 一段「像 AI 會吐出」的 **authoring 形式** JSON（秒 / 角度 / camera lookAt），供 SceneLoader
+ * 的「載入範例」示範完整往返：authoring JSON → loadScene 編譯驗證 → 載入播放。純 authored。
  */
 export function exampleTimelineJson(): string {
   const scene = {
     id: 'hello_scene',
-    name: 'Hello（load via JSON）',
+    name: 'Hello（authoring form）',
     tickRate: 60,
-    durationTicks: 240,
+    durationSeconds: 4,
     assets: [],
     entities: [
+      {
+        id: 'cam',
+        name: 'Camera',
+        // 相機用 lookAt 注視原點；載入時自動算出旋轉（不用手算 euler）。
+        components: [
+          { type: 'Transform', data: { position: { x: 0, y: 6, z: 14 } } },
+          { type: 'Camera', data: { projection: 'perspective', fov: 50, lookAt: { x: 0, y: 0, z: 0 } } },
+        ],
+      },
       {
         id: 'ground',
         name: 'Ground',
@@ -114,7 +123,7 @@ export function exampleTimelineJson(): string {
         name: 'Label',
         components: [
           { type: 'Transform', data: { position: { x: 0, y: 3, z: -2 } } },
-          { type: 'Text', data: { content: 'Loaded via JSON', fontSize: 72, color: '#39d98a' } },
+          { type: 'Text', data: { content: 'authoring form', fontSize: 72, color: '#39d98a' } },
         ],
       },
     ],
@@ -125,9 +134,9 @@ export function exampleTimelineJson(): string {
         kind: 'authored',
         target: 'transform.position',
         keyframes: [
-          { tick: 0, value: { x: -3, y: 0.6, z: 0 } },
-          { tick: 120, value: { x: 3, y: 0.6, z: 0 }, easing: 'easeInOut' },
-          { tick: 240, value: { x: -3, y: 0.6, z: 0 }, easing: 'easeInOut' },
+          { atSeconds: 0, value: { x: -3, y: 0.6, z: 0 } },
+          { atSeconds: 2, value: { x: 3, y: 0.6, z: 0 }, easing: 'easeInOut' },
+          { atSeconds: 4, value: { x: -3, y: 0.6, z: 0 }, easing: 'easeInOut' },
         ],
       },
       {
@@ -135,9 +144,10 @@ export function exampleTimelineJson(): string {
         entityId: 'orb',
         kind: 'authored',
         target: 'transform.rotation',
+        // 旋轉用「角度」：一圈 = 360 度（載入時換算弧度）。
         keyframes: [
-          { tick: 0, value: { x: 0, y: 0, z: 0 } },
-          { tick: 240, value: { x: 0, y: 6.28, z: 0 } },
+          { atSeconds: 0, value: { x: 0, y: 0, z: 0 } },
+          { atSeconds: 4, value: { x: 0, y: 360, z: 0 } },
         ],
       },
     ],

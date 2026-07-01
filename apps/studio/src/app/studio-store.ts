@@ -3,7 +3,7 @@ import type { SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
 import { ControllerRegistry, KinematicController, ReplaySession } from '@frameforge/engine-core';
 import type { TimelinePlayer } from '@frameforge/engine-three';
 import { exportToMp4, isWebCodecsSupported } from '@frameforge/engine-export';
-import { validateTimeline, type ValidationError } from '@frameforge/scene-schema';
+import { loadScene, type ValidationError } from '@frameforge/scene-schema';
 import { HERO_ID, SEED, buildTimeline } from './scene-data';
 
 export interface LoadOutcome {
@@ -88,7 +88,8 @@ export class StudioStore {
         errors: [{ path: '(json)', message: `JSON 解析失敗：${(e as Error).message}` }],
       };
     }
-    const result = validateTimeline(json);
+    // loadScene 自動辨識 authoring（秒/角度/lookAt）或 canonical，並回傳驗證後的 canonical。
+    const result = loadScene(json);
     if (!result.ok) return { ok: false, errors: result.errors };
     // scene-schema 契約比 shared-types 更嚴格，驗證通過後可安全視為 SceneTimeline。
     this.applyTimeline(result.timeline as unknown as SceneTimeline);

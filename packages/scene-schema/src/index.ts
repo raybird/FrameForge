@@ -27,3 +27,13 @@ export {
 
 // LLM structured output
 export { sceneTimelineJsonSchema, type JsonSchemaOptions } from './json-schema';
+
+// authoring 編譯層（秒 / 角度 / lookAt → canonical）
+export {
+  authoredScene,
+  compileScene,
+  loadScene,
+  sceneAuthoringJsonSchema,
+  eulerFromLookAt,
+  type CompileOptions,
+} from './authoring';
