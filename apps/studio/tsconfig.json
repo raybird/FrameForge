@@ -18,7 +18,8 @@
     "paths": {
       "@frameforge/shared-types": ["../../packages/shared-types/src/index.ts"],
       "@frameforge/engine-core": ["../../packages/engine-core/src/index.ts"],
-      "@frameforge/engine-three": ["../../packages/engine-three/src/index.ts"]
+      "@frameforge/engine-three": ["../../packages/engine-three/src/index.ts"],
+      "@frameforge/engine-export": ["../../packages/engine-export/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

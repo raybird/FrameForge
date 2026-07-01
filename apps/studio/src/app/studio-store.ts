@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import type { SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
 import { ControllerRegistry, KinematicController, ReplaySession } from '@frameforge/engine-core';
 import type { TimelinePlayer } from '@frameforge/engine-three';
+import { exportToMp4, isWebCodecsSupported } from '@frameforge/engine-export';
 import { DURATION, HERO_ID, SEED, buildTimeline } from './scene-data';
 
 /**
@@ -18,11 +19,14 @@ export class StudioStore {
   private readonly registry = new ControllerRegistry().register(KinematicController);
   private session = this.newSession();
   private player: TimelinePlayer | null = null;
+  private canvas: HTMLCanvasElement | null = null;
 
   readonly tick = signal<Tick>(0);
   readonly playing = signal(false);
   readonly selectedId = signal<string | null>(null);
   readonly world = signal<WorldState | null>(null);
+  readonly exporting = signal(false);
+  readonly exportProgress = signal(0);
 
   private newSession(): ReplaySession {
     return new ReplaySession(this.timeline, {
@@ -45,10 +49,41 @@ export class StudioStore {
     this.playing.set(this.player?.playing ?? false);
   };
 
-  attachPlayer(p: TimelinePlayer): void {
+  attachPlayer(p: TimelinePlayer, canvas: HTMLCanvasElement): void {
     this.player = p;
+    this.canvas = canvas;
     this.tick.set(p.scheduler.tick);
     this.playing.set(p.playing);
+  }
+
+  readonly canExport = isWebCodecsSupported();
+
+  /** 逐幀匯出目前錄製內容為 MP4 並觸發下載。 */
+  async export(): Promise<void> {
+    const p = this.player;
+    const canvas = this.canvas;
+    if (!p || !canvas || this.exporting()) return;
+
+    p.pause();
+    const resumeTick = p.scheduler.tick;
+    this.exporting.set(true);
+    this.exportProgress.set(0);
+    try {
+      const blob = await exportToMp4({
+        renderAt: (t) => p.renderAt(t),
+        capture: () => canvas,
+        width: canvas.width,
+        height: canvas.height,
+        endTick: this.durationTicks,
+        tickRate: this.tickRate,
+        fps: 30,
+        onProgress: (done, total) => this.exportProgress.set(done / total),
+      });
+      downloadBlob(blob, 'frameforge.mp4');
+    } finally {
+      this.exporting.set(false);
+      p.seekTick(resumeTick); // 還原匯出前的畫面
+    }
   }
 
   togglePlay(): void {
@@ -94,4 +129,13 @@ export class StudioStore {
     this.player?.seekTick(0);
     this.playing.set(false);
   }
+}
+
+function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }

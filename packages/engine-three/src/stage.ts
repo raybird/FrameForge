@@ -21,6 +21,8 @@ export class Stage {
   readonly scene: THREE.Scene;
   readonly camera: THREE.PerspectiveCamera;
   readonly renderer?: THREE.WebGLRenderer;
+  /** 供逐幀匯出擷取像素。 */
+  readonly canvas?: HTMLCanvasElement;
 
   constructor(opts: StageOptions = {}) {
     const width = opts.width ?? 800;
@@ -40,7 +42,13 @@ export class Stage {
     this.scene.add(ambient, dir);
 
     if (opts.canvas) {
-      this.renderer = new THREE.WebGLRenderer({ canvas: opts.canvas, antialias: true });
+      this.canvas = opts.canvas;
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: opts.canvas,
+        antialias: true,
+        // 逐幀匯出需在 render 後同步讀回像素 → 保留繪圖緩衝。
+        preserveDrawingBuffer: true,
+      });
       this.renderer.setSize(width, height, false);
       this.renderer.setPixelRatio(
         typeof window !== 'undefined' ? window.devicePixelRatio : 1,

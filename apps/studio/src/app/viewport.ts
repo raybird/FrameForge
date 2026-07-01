@@ -48,7 +48,7 @@ export class ViewportComponent implements AfterViewInit, OnDestroy {
       onRender: this.store.onRender,
     });
     this.player.mount();
-    this.store.attachPlayer(this.player);
+    this.store.attachPlayer(this.player, canvas);
   }
 
   ngOnDestroy(): void {

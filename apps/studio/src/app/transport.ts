@@ -20,6 +20,14 @@ import { StudioStore } from './studio-store';
       />
       <span class="time">tick {{ store.tick() }} / {{ seconds() }}s</span>
       <button (click)="store.reset()" title="清除錄製">⟲ 清除</button>
+      <button
+        class="export"
+        (click)="store.export()"
+        [disabled]="store.exporting() || !store.canExport"
+        [title]="store.canExport ? '逐幀匯出 MP4' : '此瀏覽器不支援 WebCodecs'"
+      >
+        {{ store.exporting() ? '匯出中 ' + pct() + '%' : '⬇ 匯出 MP4' }}
+      </button>
     </div>
   `,
   styles: [
@@ -56,6 +64,10 @@ export class TransportComponent {
 
   seconds(): string {
     return (this.store.tick() / this.store.tickRate).toFixed(2);
+  }
+
+  pct(): number {
+    return Math.round(this.store.exportProgress() * 100);
   }
 
   onSpeed(e: Event): void {
