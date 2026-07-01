@@ -31,14 +31,26 @@ export function buildTimeline(): SceneTimeline {
       {
         id: 'spinner',
         name: 'Spinner',
+        // Mesh 球體（authored 自轉），展示 render 端吃 Mesh。
         components: [
-          { type: 'Transform', data: { position: { x: -4, y: 0.5, z: -2 }, color: 0x3a86ff } },
+          { type: 'Transform', data: { position: { x: -4, y: 0.5, z: -2 } } },
+          { type: 'Mesh', data: { shape: 'sphere', size: 1.4, color: 0x3a86ff } },
+        ],
+      },
+      {
+        id: 'title',
+        name: 'Title',
+        // Text 圖層（瀏覽器以 canvas 貼圖畫出文字），展示 render 端吃 Text。
+        components: [
+          { type: 'Transform', data: { position: { x: 0, y: 3.4, z: -3 } } },
+          { type: 'Text', data: { content: 'FrameForge', fontSize: 96, color: '#ffffff' } },
         ],
       },
       {
         id: HERO_ID,
         name: 'Hero',
-        components: [{ type: 'Sprite', data: { color: 0xffd400 } }],
+        // Sprite 平面看板，展示 render 端吃 Sprite。
+        components: [{ type: 'Sprite', data: { color: 0xffd400, width: 1.2, height: 1.2 } }],
       },
     ],
     tracks: [

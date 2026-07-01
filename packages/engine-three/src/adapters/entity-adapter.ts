@@ -32,6 +32,7 @@ export class EntityAdapter implements FrameAdapter {
   mount(_ctx: FrameContext): void {
     for (const entity of this.entities) {
       const obj = this.factory(entity);
+      if (!obj) continue; // null = 不進場景（例：Camera 由 SceneAdapter 驅動）
       this.objects.set(entity.id, obj);
       this.root.add(obj);
     }
@@ -84,8 +85,14 @@ function applyOpacity(obj: THREE.Object3D, opacity: number): void {
 }
 
 function disposeObject(obj: THREE.Object3D): void {
-  const mesh = obj as THREE.Mesh;
-  mesh.geometry?.dispose();
-  const material = mesh.material;
-  if (material) (Array.isArray(material) ? material : [material]).forEach((m) => m.dispose());
+  obj.traverse((node) => {
+    const mesh = node as THREE.Mesh;
+    mesh.geometry?.dispose();
+    const material = mesh.material;
+    if (!material) return;
+    for (const m of Array.isArray(material) ? material : [material]) {
+      (m as THREE.MeshBasicMaterial).map?.dispose(); // canvas / 貼圖
+      m.dispose();
+    }
+  });
 }

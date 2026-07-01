@@ -11,6 +11,7 @@ import type { EntityId, JsonValue } from './common';
 /**
  * 甲（宣告式場景合成器）支援的 component 類型。
  * 注意：Collider 在甲「只做觸發體積」（進入/離開區域），不做剛體動力學。
+ * Camera / Text 為 render 端第一公民（cinematic 運鏡與字幕）；型別契約見 @frameforge/scene-schema。
  */
 export type ComponentType =
   | 'Transform'
@@ -19,7 +20,9 @@ export type ComponentType =
   | 'Animator'
   | 'Collider'
   | 'Script'
-  | 'AudioSource';
+  | 'AudioSource'
+  | 'Camera'
+  | 'Text';
 
 export interface ComponentDef {
   type: ComponentType;

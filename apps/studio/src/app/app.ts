@@ -19,8 +19,8 @@ import { InspectorComponent } from './inspector';
           <ff-viewport />
           <ff-transport />
           <p class="hint">
-            按 ▶ 後用<b>方向鍵</b>駕駛 <b style="color:#ffd400">hero</b>（黃方塊），操作即時錄製；
-            把時間軸往回拖即可看到逐 tick 重播。藍色方塊是 authored 自轉動畫。
+            按 ▶ 後用<b>方向鍵</b>駕駛 <b style="color:#ffd400">hero</b>（黃色 Sprite），操作即時錄製；
+            把時間軸往回拖即可看到逐 tick 重播。藍色球體是 authored 自轉的 Mesh，上方 FrameForge 是 Text 圖層。
           </p>
         </section>
         <aside class="right"><ff-inspector /></aside>
