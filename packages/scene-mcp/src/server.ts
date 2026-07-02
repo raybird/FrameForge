@@ -1,8 +1,9 @@
 /**
  * FrameForge 場景的 MCP server（stdio）。
  *
- * 對 MCP 客戶端（Claude Code / Claude Desktop）暴露三個工具：
+ * 對任何 MCP 客戶端（Claude Code / Codex / opencode / Antigravity …）暴露四個工具：
  *   - get_scene_schema：拿 JSON Schema + 撰寫指南
+ *   - compile_scene  ：authoring（秒 / 角度 / lookAt）→ canonical，並一併驗證
  *   - validate_scene ：驗證 timeline，回傳可修正的錯誤（agent 的修正迴圈靠這個）
  *   - save_scene     ：驗證通過才寫成 JSON 檔（給 Studio 載入）
  *
@@ -17,8 +18,30 @@ import { AUTHORING_GUIDE, schemaText, validateScene, compileToCanonical, saveSce
 /** timeline 參數：物件或 JSON 字串皆可。 */
 const timelineArg = z.union([z.string(), z.record(z.string(), z.unknown())]);
 
+/**
+ * Server 層級的使用指南——透過 MCP 協定的 `instructions` 送進任何客戶端
+ * （Claude Code / Codex / opencode / Antigravity …）的模型上下文，
+ * 等於「一份跟著 server 走的 skill」，不需各家各裝一份。
+ */
+const SERVER_INSTRUCTIONS = [
+  'FrameForge 場景生成工具。用途：把需求變成可在 FrameForge Studio 播放 / 任意 seek / 匯出 MP4 的決定性 2.5D/3D 場景（timeline）。',
+  '',
+  '建議工作流：',
+  '1) 先呼叫 get_scene_schema 取得 authoring 形式的 JSON Schema 與撰寫指南（時間用秒、旋轉用角度、相機用 lookAt）。',
+  '2) 依 schema 產生 authoring JSON。',
+  '3) 呼叫 compile_scene 編譯成 canonical 並驗證；若回傳錯誤，依訊息修正後重試，直到通過。',
+  '4) 呼叫 save_scene 寫出檔案，或把 canonical 交給使用者貼進 Studio 的「載入場景」。',
+  'validate_scene 可在任一階段檢查（authoring 或 canonical 皆可）。',
+  '',
+  '要點：內容多為純函數 f(t)（authored track，可任意 seek）；互動片段用 controller。顏色用 0xRRGGBB 數字或 CSS 字串。',
+  '不要引用不存在的 entityId / assetId；keyframe 依時間遞增且不超過總長。',
+].join('\n');
+
 export function createServer(): McpServer {
-  const server = new McpServer({ name: 'frameforge-scene', version: '0.0.0' });
+  const server = new McpServer(
+    { name: 'frameforge-scene', version: '0.1.0' },
+    { instructions: SERVER_INSTRUCTIONS },
+  );
 
   server.registerTool(
     'get_scene_schema',
@@ -89,10 +112,5 @@ export async function main(): Promise<void> {
   await server.connect(new StdioServerTransport());
 }
 
-// 直接執行時才啟動（被測試 import 時不觸發）。
-if (process.argv[1] && import.meta.url === `file://${process.argv[1]}`) {
-  main().catch((e) => {
-    process.stderr.write(String(e?.message ?? e) + '\n');
-    process.exit(1);
-  });
-}
+// 進入點在 src/cli.ts（打包後為 dist/server.js）；此檔僅匯出 createServer / main，
+// 保持無副作用，方便測試 import 與 esbuild 打包。
