@@ -32,6 +32,9 @@ await build({
     '@frameforge/scene-schema': r('../scene-schema/src/index.ts'),
     '@frameforge/shared-types': r('../shared-types/src/index.ts'),
   },
+  // 關鍵：scene-schema 原始碼裡的 `zod/v4` 等 bare import，一律從 scene-mcp 自己的
+  // node_modules 解析——不然在「sibling 套件沒各自 npm install」的乾淨環境（如 CI）會解不到。
+  nodePaths: [r('node_modules')],
   // 不設 external：sdk / zod 一併 inline；node: 內建由 platform:'node' 自動外部化。
   logLevel: 'info',
 });
