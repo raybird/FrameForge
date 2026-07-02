@@ -26,9 +26,7 @@ FrameForge Studio 播放、任意 seek、逐幀匯出 MP4。
 `frameforge-scene-mcp`。需要目標機器有 **Node 20+**（產物是 `#!/usr/bin/env node` 腳本）。
 
 ```bash
-# 把 OWNER/REPO 換成本專案的 GitHub owner/repo
-FRAMEFORGE_REPO=OWNER/REPO \
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/OWNER/REPO/main/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/raybird/FrameForge/main/install.sh)"
 ```
 
 腳本會下載最新 release 的 `frameforge-scene-mcp` 到 `~/.local/bin`（可用 `FRAMEFORGE_BIN_DIR` 改），

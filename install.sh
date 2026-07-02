@@ -2,24 +2,18 @@
 # FrameForge scene-mcp 安裝器（Linux / macOS）。
 # 從 GitHub Release 下載自包單檔，放進 PATH。無需 npm。
 #
-#   curl -fsSL https://raw.githubusercontent.com/OWNER/REPO/main/install.sh | sh
+#   sh -c "$(curl -fsSL https://raw.githubusercontent.com/raybird/FrameForge/main/install.sh)"
 #
 # 可用環境變數：
-#   FRAMEFORGE_REPO     GitHub 的 owner/repo（必填；預設為占位字串）
+#   FRAMEFORGE_REPO     GitHub 的 owner/repo（預設 raybird/FrameForge）
 #   FRAMEFORGE_BIN_DIR  安裝目錄（預設 ~/.local/bin）
 #   第一個參數          指定版本 tag（預設 latest），例：sh install.sh v0.1.0
 set -e
 
-REPO="${FRAMEFORGE_REPO:-OWNER/REPO}"
+REPO="${FRAMEFORGE_REPO:-raybird/FrameForge}"
 BIN_DIR="${FRAMEFORGE_BIN_DIR:-$HOME/.local/bin}"
 NAME="frameforge-scene-mcp"
 VERSION="${1:-latest}"
-
-if [ "$REPO" = "OWNER/REPO" ]; then
-  echo "✋ 請先設定 GitHub repo：FRAMEFORGE_REPO=你的帳號/FrameForge sh install.sh" >&2
-  echo "   （或直接編輯本檔頂部的 REPO 預設值）" >&2
-  exit 1
-fi
 
 # 產物是 #!/usr/bin/env node 腳本 → 目標機需要 Node。
 if ! command -v node >/dev/null 2>&1; then
