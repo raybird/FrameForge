@@ -15,6 +15,7 @@ FrameForge Studio 播放、任意 seek、逐幀匯出 MP4。
 | `compile_scene` | authoring → canonical，並一併驗證；回傳 canonical JSON 或可修正的錯誤 |
 | `validate_scene` | 驗證場景（authoring 或 canonical 皆可），回傳可據以修正的錯誤 |
 | `save_scene` | 驗證/編譯通過才把 canonical timeline 寫成 JSON 檔（給 Studio 載入） |
+| `render_scene` | 驗證通過後用 **headless Chrome** 逐幀渲染成 MP4 檔（生成→影片一路到底）。需本機有 Chrome 與 `scene-render`（`frameforge-scene-render`，或設 `FRAMEFORGE_RENDER_CMD`）；不在時優雅降級並提示需求 |
 
 驗證與編譯由 `@frameforge/scene-schema` 負責（zod + 交叉引用；秒→tick、角度→弧度、lookAt→euler）。
 伺服器另透過 MCP 的 `instructions` 欄位附上「使用工作流」，任何客戶端連上後模型都會看到——
@@ -98,6 +99,7 @@ npm run build   # → dist/server.js（自包單檔，含 shebang）
 2. 依 schema 產生 authoring JSON。
 3. `compile_scene` — 編成 canonical 並驗證；有錯就依訊息修正後重試，直到通過。
 4. `save_scene` — 寫出檔案，或把 canonical 交給使用者貼進 Studio 的「載入場景」。
+5. `render_scene` — 要直接產出影片時呼叫（headless 渲染成 MP4；需本機 Chrome + scene-render）。
 
 `validate_scene` 可在任一階段檢查。內容多為純函數 `f(t)`（authored track，可任意 seek）；
 互動片段用 controller。顏色用 `0xRRGGBB` 數字或 CSS 字串；不要引用不存在的
