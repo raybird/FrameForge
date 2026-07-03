@@ -79,6 +79,11 @@ export const KinematicController: Controller = {
     return { x: s.x, y: s.y, z: s.z, vx: s.vx, vy: s.vy, vz: s.vz };
   },
 
+  readPosition(state) {
+    const s = asKin(state);
+    return { x: s.x, y: s.y, z: s.z };
+  },
+
   project(state, segment, world) {
     const s = asKin(state);
     const es = world.entities.find((e) => e.id === segment.entityId);

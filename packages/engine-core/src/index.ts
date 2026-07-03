@@ -19,8 +19,9 @@ export type { SchedulerOptions } from './scheduler/scheduler';
 
 // Replay（命脈②）
 export { ControllerRegistry } from './replay/controller';
-export type { Controller, ControllerState, StepContext } from './replay/controller';
+export type { Controller, ControllerPhase, ControllerState, StepContext } from './replay/controller';
 export { KinematicController } from './replay/kinematic-controller';
+export { TriggerController } from './replay/trigger-controller';
 export { Simulation, cloneSimState } from './replay/simulation';
 export type { SimState } from './replay/simulation';
 export { ReplayRecorder, indexEvents } from './replay/replay-log';

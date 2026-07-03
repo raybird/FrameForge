@@ -12,6 +12,7 @@ import type {
   ReplayEvent,
   RngState,
   Tick,
+  Vec3,
   WorldState,
 } from '@frameforge/shared-types';
 import { Mulberry32 } from '../rng/mulberry32';
@@ -83,19 +84,32 @@ export class Simulation {
       const rng = Mulberry32.fromState(this.state.rngState);
       const tickEvents = eventsByTick.get(nextTick);
 
-      for (const seg of this.segments) {
-        if (!isSegmentActive(seg, nextTick)) continue;
-        const controller = this.registry.get(seg.controller);
-        if (!controller) continue;
+      // 本 tick 由 motion 控制器算出的位置；sensor（觸發）可讀取。
+      const posThisTick = new Map<string, Vec3>();
+      const readPos = (id: string): Vec3 | null => posThisTick.get(id) ?? null;
 
-        const segEvents = tickEvents ? tickEvents.filter((e) => eventTargets(e, seg)) : [];
-        this.state.controllers[seg.id] = controller.step({
-          segment: seg,
-          state: this.state.controllers[seg.id] ?? controller.init(seg),
-          events: segEvents,
-          rng,
-          tick: nextTick,
-        });
+      // 兩階段：motion 先跑（產生位置），sensor 後跑（讀本 tick 位置）。
+      for (const phase of ['motion', 'sensor'] as const) {
+        for (const seg of this.segments) {
+          const controller = this.registry.get(seg.controller);
+          if (!controller) continue;
+          if ((controller.phase ?? 'motion') !== phase) continue;
+          if (!isSegmentActive(seg, nextTick)) continue;
+
+          const segEvents = tickEvents ? tickEvents.filter((e) => eventTargets(e, seg)) : [];
+          const next = controller.step({
+            segment: seg,
+            state: this.state.controllers[seg.id] ?? controller.init(seg),
+            events: segEvents,
+            rng,
+            tick: nextTick,
+            readPos,
+          });
+          this.state.controllers[seg.id] = next;
+
+          const pos = controller.readPosition?.(next);
+          if (pos) posThisTick.set(seg.entityId, pos);
+        }
       }
 
       this.state.rngState = rng.state; // 持久化 RNG 前進
