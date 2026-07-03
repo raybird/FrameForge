@@ -85,8 +85,9 @@ export function buildTimeline(): SceneTimeline {
       },
       {
         // 觸發區：hero 進入 x∈[4.25,5.75] → 揭露 gate 並鎖定（決定性、可重播）。
+        // entityId 指向被揭露的 gate（觸發段不使用自身 entityId，但生成規範要求它是真實 entity）。
         id: 'seg_trigger',
-        entityId: 'zone',
+        entityId: 'gate',
         kind: 'interactive',
         target: 'visible',
         startTick: 0,
