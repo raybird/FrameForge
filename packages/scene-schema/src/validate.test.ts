@@ -222,3 +222,45 @@ describe('formatErrors', () => {
     expect(text.split('\n').length).toBe(r.errors.length);
   });
 });
+
+describe('validateTimeline — trigger controller', () => {
+  function withTrigger(params: Record<string, unknown>): unknown {
+    const t = validFixture() as { tracks: unknown[] };
+    t.tracks.push({
+      id: 'seg_trigger',
+      entityId: 'title',
+      kind: 'interactive',
+      target: 'transform.position',
+      startTick: 0,
+      endTick: null,
+      controller: 'trigger',
+      params,
+    });
+    return t;
+  }
+
+  it('合法 trigger（target/center/size/reveal 皆有效）通過', () => {
+    const r = validateTimeline(
+      withTrigger({ target: 'hero', center: { x: 4, y: 0, z: 0 }, size: { x: 2, y: 100, z: 100 }, reveal: 'title', latch: true }),
+    );
+    expect(r.ok).toBe(true);
+  });
+
+  it('target 參照不存在的 entity → 失敗', () => {
+    const r = validateTimeline(withTrigger({ target: 'ghost', center: { x: 0, y: 0, z: 0 }, size: { x: 1, y: 1, z: 1 } }));
+    expectFail(r);
+    expect(r.errors.some((e) => e.path.endsWith('params.target'))).toBe(true);
+  });
+
+  it('reveal 參照不存在的 entity → 失敗', () => {
+    const r = validateTimeline(withTrigger({ target: 'hero', center: { x: 0, y: 0, z: 0 }, size: { x: 1, y: 1, z: 1 }, reveal: 'nope' }));
+    expectFail(r);
+    expect(r.errors.some((e) => e.path.endsWith('params.reveal'))).toBe(true);
+  });
+
+  it('缺 center → 失敗', () => {
+    const r = validateTimeline(withTrigger({ target: 'hero', size: { x: 1, y: 1, z: 1 } }));
+    expectFail(r);
+    expect(r.errors.some((e) => e.path.endsWith('params.center'))).toBe(true);
+  });
+});

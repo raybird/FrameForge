@@ -13,7 +13,7 @@
 import { sceneTimeline, type SceneTimeline } from './timeline';
 
 /** runtime 目前實作的 controller。未知 controller 會讓互動片段跑不起來，故視為錯誤。 */
-export const KNOWN_CONTROLLERS = ['kinematic'] as const;
+export const KNOWN_CONTROLLERS = ['kinematic', 'trigger'] as const;
 
 export interface ValidationError {
   /** 例：'entities[0].components[1].data.content'。 */
@@ -42,6 +42,7 @@ export function validateTimeline(input: unknown, opts: ValidateOptions = {}): Va
 
   checkUniqueIds(t, errors);
   checkTrackReferences(t, controllers, errors);
+  checkControllerParams(t, errors);
   checkAssetReferences(t, errors);
   checkTrackTiming(t, errors);
   checkEventTiming(t, errors);
@@ -96,6 +97,52 @@ function checkTrackReferences(
       });
     }
   });
+}
+
+/** controller 專屬 params 檢查（目前：trigger 的區域與揭露目標）。 */
+function checkControllerParams(t: SceneTimeline, errors: ValidationError[]): void {
+  const entityIds = new Set(t.entities.map((e) => e.id));
+  t.tracks.forEach((tr, i) => {
+    if (tr.kind !== 'interactive' || tr.controller !== 'trigger') return;
+    const p = tr.params;
+    const base = `tracks[${i}].params`;
+
+    if (typeof p.target !== 'string') {
+      errors.push({ path: `${base}.target`, message: 'trigger 需要 target（要偵測的 entity id）' });
+    } else if (!entityIds.has(p.target)) {
+      errors.push({ path: `${base}.target`, message: `trigger.target 參照不存在的 entity '${p.target}'` });
+    }
+
+    if ('reveal' in p) {
+      if (typeof p.reveal !== 'string' || !entityIds.has(p.reveal)) {
+        errors.push({
+          path: `${base}.reveal`,
+          message: `trigger.reveal 參照不存在的 entity '${String(p.reveal)}'`,
+        });
+      }
+    }
+
+    for (const key of ['center', 'size'] as const) {
+      if (!isVec3(p[key])) {
+        errors.push({ path: `${base}.${key}`, message: `trigger 需要 ${key}: { x, y, z }（數字）` });
+      }
+    }
+
+    if ('latch' in p && typeof p.latch !== 'boolean') {
+      errors.push({ path: `${base}.latch`, message: 'latch 需為布林值' });
+    }
+  });
+}
+
+function isVec3(v: unknown): boolean {
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    !Array.isArray(v) &&
+    typeof (v as Record<string, unknown>).x === 'number' &&
+    typeof (v as Record<string, unknown>).y === 'number' &&
+    typeof (v as Record<string, unknown>).z === 'number'
+  );
 }
 
 function checkAssetReferences(t: SceneTimeline, errors: ValidationError[]): void {

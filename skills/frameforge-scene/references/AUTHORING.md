@@ -67,10 +67,26 @@ An entity with a `Camera` component drives the viewport camera (cinematic framin
 }
 ```
 
-- Only `kinematic` is a supported controller (unless `get_scene_schema` lists more).
-- The entity **sits at `params.position` until driven** — movement is *recorded interaction*
-  (arrow keys in Studio, or an imported `.replay.json`), replayed deterministically. A bare render
-  therefore shows it static. Use this to make something the user controls, not for scripted motion.
+Supported controllers: **`kinematic`** and **`trigger`** (defer to `get_scene_schema`).
+
+- **`kinematic`** (above): the entity **sits at `params.position` until driven** — movement is *recorded
+  interaction* (arrow keys in Studio, or an imported `.replay.json`), replayed deterministically. A bare
+  render shows it static. Use it to make something the user controls, not for scripted motion.
+- **`trigger`**: a **sensor**. When `params.target` (an entity id) enters the box region
+  (`params.center` / `params.size`, both `{x,y,z}` full-width), it reveals `params.reveal` (an entity id)
+  and optionally `latch`es it open. `target` and `reveal` must be **existing entity ids**. The segment's
+  own `entityId` just needs to be a declared entity (triggers don't use it — pointing it at the revealed
+  entity is fine). Pair it with an authored `visible=false` track on the revealed entity so the trigger is
+  what shows it.
+
+  ```json
+  {
+    "id": "seg_gate", "entityId": "gate", "kind": "interactive", "target": "visible",
+    "startSeconds": 0, "endSeconds": null, "controller": "trigger",
+    "params": { "target": "hero", "center": { "x": 5, "y": 0.5, "z": 0 },
+                "size": { "x": 1.5, "y": 100, "z": 100 }, "reveal": "gate", "latch": true }
+  }
+  ```
 
 ## Example 1 — purely authored cinematic (plays & renders fully)
 
@@ -149,3 +165,41 @@ An entity with a `Camera` component drives the viewport camera (cinematic framin
 
 Here `beacon` spins on its own (authored). `hero` is drivable — in Studio the user presses arrow keys to
 move it and that interaction is recorded and replayable; a bare render shows `hero` at its start position.
+
+## Example 3 — walk-into-a-zone trigger (FrameForge's differentiator)
+
+`hero` is drivable; when it enters the zone at `x≈5`, the hidden `gate` is revealed and latched.
+Record the walk-in → replay it deterministically → export or share as `.replay.json`.
+
+```json
+{
+  "id": "gate_demo",
+  "name": "Gate",
+  "tickRate": 60,
+  "durationSeconds": 10,
+  "assets": [],
+  "entities": [
+    { "id": "ground", "name": "Ground", "components": [
+      { "type": "Transform", "data": { "position": { "x": 0, "y": -1.2, "z": 0 }, "scale": { "x": 16, "y": 0.3, "z": 16 }, "color": "#2e7d32" } }
+    ] },
+    { "id": "hero", "name": "Hero", "components": [
+      { "type": "Sprite", "data": { "color": "#ffd400", "width": 1.2, "height": 1.2 } }
+    ] },
+    { "id": "gate", "name": "Gate", "components": [
+      { "type": "Transform", "data": { "position": { "x": 5, "y": 1.8, "z": 0 } } },
+      { "type": "Sprite", "data": { "color": "#ff5533", "width": 1.4, "height": 1.4 } }
+    ] }
+  ],
+  "tracks": [
+    { "id": "tk_gate_hidden", "entityId": "gate", "kind": "authored", "target": "visible",
+      "keyframes": [ { "atSeconds": 0, "value": false, "easing": "step" } ] },
+    { "id": "seg_hero", "entityId": "hero", "kind": "interactive", "target": "transform.position",
+      "startSeconds": 0, "endSeconds": null, "controller": "kinematic",
+      "params": { "position": { "x": 0, "y": 0.5, "z": 0 }, "speed": 0.1 } },
+    { "id": "seg_gate", "entityId": "gate", "kind": "interactive", "target": "visible",
+      "startSeconds": 0, "endSeconds": null, "controller": "trigger",
+      "params": { "target": "hero", "center": { "x": 5, "y": 0.5, "z": 0 }, "size": { "x": 1.5, "y": 100, "z": 100 }, "reveal": "gate", "latch": true } }
+  ],
+  "events": []
+}
+```

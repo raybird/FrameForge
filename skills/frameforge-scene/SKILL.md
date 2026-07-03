@@ -1,6 +1,6 @@
 ---
 name: frameforge-scene
-description: Generate deterministic 2.5D/3D FrameForge scenes (timelines) from a natural-language brief using the frameforge-scene MCP server, then validate and either save the JSON or render it to MP4. Use when the user wants to author, generate, or create a FrameForge scene, an animated 2.5D/3D scene, a seekable/replayable scene, a keyframed camera/text/mesh/sprite animation, or export such a scene to a video clip. Handles authored keyframe animation (f(t)), user-drivable interactive segments, cameras with lookAt, text layers, and asset-backed sprites/models.
+description: Generate deterministic 2.5D/3D FrameForge scenes (timelines) from a natural-language brief using the frameforge-scene MCP server, then validate and either save the JSON or render it to MP4. Use when the user wants to author, generate, or create a FrameForge scene, an animated 2.5D/3D scene, a seekable/replayable scene, a keyframed camera/text/mesh/sprite animation, an interactive scene with trigger volumes (reveal-on-enter), or export such a scene to a video clip. Handles authored keyframe animation (f(t)), user-drivable kinematic segments, trigger controllers, cameras with lookAt, text layers, and asset-backed sprites/models.
 license: MIT
 compatibility: Requires the "frameforge-scene" MCP server configured in your agent (see packages/scene-mcp). The render_scene tool additionally needs local Chrome plus the scene-render CLI or a built Studio.
 metadata:
@@ -53,11 +53,16 @@ Components (on `entity.components`, each `{ type, data }`): `Transform`, `Sprite
 - **`authored`** (default, use this most): a pure function of time `f(t)`. `keyframes` (by `atSeconds`,
   increasing, within duration) fully drive the property. This is what plays and renders on its own —
   cinematic motion, camera moves, fades, spins, text. **For "make a video / animation", use authored tracks.**
-- **`interactive`** (`controller: "kinematic"`): marks an entity as **user-drivable at runtime**. It sits
-  at its initial `position` until someone drives it (arrow keys in Studio, or an imported `.replay.json`).
-  Use it when the brief wants the user to *control* something. **A bare render of an interactive-only
-  entity shows it static** — the movement is recorded interaction, not authored. Only `kinematic` is a
-  supported controller unless `get_scene_schema` says otherwise.
+- **`interactive`** — a segment driven by a **controller** (supported: `kinematic`, `trigger`; always
+  defer to `get_scene_schema` for the current list):
+  - **`kinematic`** marks an entity **user-drivable at runtime**. It sits at its initial `position` until
+    someone drives it (arrow keys in Studio, or an imported `.replay.json`). **A bare render shows it
+    static** — the motion is *recorded interaction*, not authored. `params: { position, speed }`.
+  - **`trigger`** is a **sensor**: when `params.target` (an entity id) enters the box region
+    (`params.center` / `params.size`, both `{x,y,z}`), it reveals `params.reveal` (an entity id, kept
+    hidden by an authored `visible=false` track) and optionally `latch`es it open. This is FrameForge's
+    differentiator — *walk into a zone → reveal, recorded and deterministically replayable*.
+    `params: { target, center, size, reveal?, latch? }`; `target`/`reveal` must be existing entity ids.
 
 See `references/AUTHORING.md` for the full field reference and two complete worked examples.
 
@@ -72,7 +77,9 @@ and build the Studio once with `ng build`). If it returns a "render not availabl
 
 - `expected number, received undefined` on `atSeconds` / `durationSeconds` → you wrote canonical (ticks)
   instead of authoring (seconds). Switch to seconds.
-- `未知的 controller '…'` → only `kinematic` is supported; don't invent controllers.
+- `未知的 controller '…'` → only `kinematic` and `trigger` are supported; don't invent controllers.
+- `trigger.target/reveal 參照不存在的 entity` → point them at declared entity ids; a revealed entity
+  usually also needs an authored `visible` track starting `false` so the trigger is what shows it.
 - References a non-existent `entityId` / `assetId` → every track/segment must point at a declared entity;
   every `assetId` must exist in `assets`.
 - `keyframe` out of order or past `durationSeconds` → keep `atSeconds` strictly increasing and in range.
