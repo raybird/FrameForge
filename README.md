@@ -13,7 +13,8 @@
 三根支柱都已落地並經測試 / headless 實測:
 
 - **Seekable** ✅ 時間軸 → `WorldState` → Three.js,任意 t 求值零漂移
-- **Replayable** ✅ 薄 SimCore + Snapshot;互動可錄、可倒帶重播、可匯出/匯入分享(`.replay.json`)
+- **Replayable** ✅ 薄 SimCore + Snapshot;互動可錄、可倒帶重播、可匯出/匯入分享(`.replay.json`);
+  含**觸發體積**(走進區域→揭露/開門,決定性可重播)——這條互動錄播是唯一未被對手佔據的差異化,且 **AI 生成鏈也已支援**
 - **Exportable** ✅ 逐幀 WebCodecs → MP4;AI 生成 → 渲染出片全程 agent 端閉環
 
 可安裝 / 可跑的東西有三塊:**scene-mcp**(AI 生成)、**Studio**(播放/編輯)、**render_scene**(出片,選配)。

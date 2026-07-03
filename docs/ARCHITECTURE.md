@@ -2,6 +2,11 @@
 
 > 文件版本：v1.0　|　日期：2026-06-17
 > 狀態：已收斂（路線甲）。本文件為後續開發的唯一架構依據。
+>
+> **現況同步（2026-07-03）：** 三支柱（Seekable / Replayable / Exportable）已落地；此外 P5 已加入
+> `scene-schema`（zod 驗證 + LLM JSON Schema）、`scene-mcp`（生成 MCP，含 `render_scene` 出片）、
+> `scene-render`，以及 **trigger controller**（觸發體積：走進區域→揭露，決定性可重播；生成鏈亦已支援）。
+> 本文 body 是原始設計藍圖，實作細節以各套件與 [`README`](../README.md) 為準。
 
 ---
 
@@ -318,21 +323,26 @@ png / jpg / svg / lottie / gltf / glb / mp3 / wav / json
 
 ```txt
 apps/
-  studio/                 # Angular Studio（editor / timeline / property-panel / scene-tree）
+  studio/                 # Angular Studio（scene-tree / timeline / inspector / 錄製 / 匯出）
 
 packages/
-  engine-core/            # scheduler / adapter / entity / component / replay / snapshot
-  engine-three/           # renderer / camera / scene / character
-  engine-lottie/          # player / adapter
-  engine-audio/           # audio-context（realtime + offline）/ adapter
-  engine-export/          # capture / encoder（WebCodecs + ffmpeg fallback）
-  shared-types/           # scene.schema.ts / asset.schema.ts / replay.schema.ts / worldstate.schema.ts
+  shared-types/           # 共用型別契約（零 runtime 依賴）
+  engine-core/            # scheduler / evaluator / PRNG / SimCore / snapshot / controllers（kinematic, trigger）
+  engine-three/           # WorldState → Three.js 投影 seek adapters / asset pipeline
+  engine-export/          # 逐幀擷取 + WebCodecs → MP4
+  scene-schema/           # 場景 zod 驗證 + 給 LLM 的 JSON Schema（秒/角度/lookAt → canonical）
+  scene-mcp/              # 場景生成 MCP 工具伺服器（get_scene_schema / compile / validate / save / render_scene）
+  scene-render/           # Node 端渲染場景 → MP4（headless Chrome + 重用 Studio）
+
+skills/
+  frameforge-scene/       # agent skill（agentskills.io 規範），驅動 scene-mcp
 
 docs/
   ARCHITECTURE.md         # 本文件
 ```
 
-> 工具鏈（Nx / pnpm workspace / Angular CLI）尚未拍板；目錄結構本身與工具鏈無關。
+> engine-lottie / engine-audio 為原始藍圖規劃、尚未實作（Lottie 見 §5.1、Audio 見 §6）。
+> 工具鏈（Nx / pnpm workspace / Angular CLI）尚未拍板；各套件目前獨立 install。
 
 ---
 
