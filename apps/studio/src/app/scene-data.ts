@@ -52,6 +52,15 @@ export function buildTimeline(): SceneTimeline {
         // Sprite 平面看板，展示 render 端吃 Sprite。
         components: [{ type: 'Sprite', data: { color: 0xffd400, width: 1.2, height: 1.2 } }],
       },
+      {
+        id: 'gate',
+        name: 'Gate（觸發顯示）',
+        // 預設隱藏；hero 走進觸發區（x≈5）時由 TriggerController 揭露並鎖定。
+        components: [
+          { type: 'Transform', data: { position: { x: 5, y: 1.8, z: 0 } } },
+          { type: 'Sprite', data: { color: 0xff5533, width: 1.4, height: 1.4 } },
+        ],
+      },
     ],
     tracks: [
       {
@@ -73,6 +82,30 @@ export function buildTimeline(): SceneTimeline {
         endTick: null,
         controller: 'kinematic',
         params: { position: { x: 0, y: 0.5, z: 0 }, speed: 0.1 },
+      },
+      {
+        // 觸發區：hero 進入 x∈[4.25,5.75] → 揭露 gate 並鎖定（決定性、可重播）。
+        id: 'seg_trigger',
+        entityId: 'zone',
+        kind: 'interactive',
+        target: 'visible',
+        startTick: 0,
+        endTick: null,
+        controller: 'trigger',
+        params: {
+          target: HERO_ID,
+          center: { x: 5, y: 0.5, z: 0 },
+          size: { x: 1.5, y: 100, z: 100 },
+          reveal: 'gate',
+          latch: true,
+        },
+      },
+      {
+        id: 'tk_gate_vis',
+        entityId: 'gate',
+        kind: 'authored',
+        target: 'visible',
+        keyframes: [{ tick: 0, value: false, easing: 'step' }],
       },
     ],
     events: [],

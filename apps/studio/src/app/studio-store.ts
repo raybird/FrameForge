@@ -1,6 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import type { ReplayLog, SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
-import { ControllerRegistry, KinematicController, ReplaySession } from '@frameforge/engine-core';
+import {
+  ControllerRegistry,
+  KinematicController,
+  ReplaySession,
+  TriggerController,
+} from '@frameforge/engine-core';
 import {
   createObjectFactory,
   preloadAssets,
@@ -33,7 +38,9 @@ export class StudioStore {
     return this.timeline().tickRate;
   }
 
-  private readonly registry = new ControllerRegistry().register(KinematicController);
+  private readonly registry = new ControllerRegistry()
+    .register(KinematicController)
+    .register(TriggerController);
   private session = this.newSession();
   private player: TimelinePlayer | null = null;
   private canvas: HTMLCanvasElement | null = null;
