@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { StudioStore } from './studio-store';
 
 @Component({
@@ -28,6 +28,14 @@ import { StudioStore } from './studio-store';
       >
         {{ store.exporting() ? '匯出中 ' + pct() + '%' : '⬇ 匯出 MP4' }}
       </button>
+      <button class="replay-out" (click)="store.exportReplay()" title="匯出互動錄製（可分享、可逐位元重播）">
+        ⬇ Replay
+      </button>
+      <button class="replay-in" (click)="fileInput.click()" title="匯入 Replay 並重播">⬆ Replay</button>
+      <input #fileInput type="file" accept="application/json,.json" hidden (change)="onReplayFile($event)" />
+      @if (replayStatus()) {
+        <span class="replay-status" [class.err]="replayError()">{{ replayStatus() }}</span>
+      }
     </div>
   `,
   styles: [
@@ -61,6 +69,8 @@ import { StudioStore } from './studio-store';
 })
 export class TransportComponent {
   readonly store = inject(StudioStore);
+  readonly replayStatus = signal('');
+  readonly replayError = signal(false);
 
   seconds(): string {
     return (this.store.tick() / this.store.tickRate).toFixed(2);
@@ -76,5 +86,17 @@ export class TransportComponent {
 
   onSeek(e: Event): void {
     this.store.seek(Number((e.target as HTMLInputElement).value));
+  }
+
+  async onReplayFile(e: Event): Promise<void> {
+    const input = e.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // 允許重選同一檔
+    if (!file) return;
+    const outcome = this.store.importReplay(await file.text());
+    this.replayError.set(!outcome.ok);
+    this.replayStatus.set(
+      outcome.ok ? 'Replay 已匯入 ✓' : '匯入失敗：' + outcome.errors.map((x) => x.message).join('; '),
+    );
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import type { SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
+import type { ReplayLog, SceneTimeline, Tick, WorldState } from '@frameforge/shared-types';
 import { ControllerRegistry, KinematicController, ReplaySession } from '@frameforge/engine-core';
 import {
   createObjectFactory,
@@ -207,6 +207,65 @@ export class StudioStore {
     this.player?.seekTick(0);
     this.playing.set(false);
   }
+
+  // ── Replay 分享（護城河：錄下的互動可存檔、可被他人逐位元重播）──
+
+  /** 匯出目前錄製的 ReplayLog 為 .replay.json。 */
+  exportReplay(): void {
+    downloadJson(this.session.exportLog(), 'frameforge.replay.json');
+  }
+
+  /**
+   * 匯入 ReplayLog：以其事件與 seed 重建 session，套到目前場景。
+   * 回傳 errors 可直接顯示（沿用 LoadOutcome）。
+   */
+  importReplay(text: string): LoadOutcome {
+    let json: unknown;
+    try {
+      json = JSON.parse(text);
+    } catch (e) {
+      return { ok: false, errors: [{ path: '(json)', message: `JSON 解析失敗：${(e as Error).message}` }] };
+    }
+    const errors = validateReplayShape(json);
+    if (errors.length) return { ok: false, errors };
+
+    const log = json as ReplayLog;
+    this.player?.pause();
+    this.session = new ReplaySession(this.timeline(), {
+      registry: this.registry,
+      log,
+      seed: log.seed,
+      snapshotInterval: 60,
+    });
+    this.player?.seekTick(0);
+    this.playing.set(false);
+    return { ok: true, errors: [] };
+  }
+}
+
+function downloadJson(obj: unknown, filename: string): void {
+  downloadBlob(new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' }), filename);
+}
+
+function validateReplayShape(json: unknown): ValidationError[] {
+  const errs: ValidationError[] = [];
+  if (typeof json !== 'object' || json === null) {
+    return [{ path: '(root)', message: '不是物件' }];
+  }
+  const o = json as Record<string, unknown>;
+  if (typeof o['tickRate'] !== 'number') errs.push({ path: 'tickRate', message: '缺少或非數字' });
+  if (typeof o['seed'] !== 'number') errs.push({ path: 'seed', message: '缺少或非數字' });
+  if (!Array.isArray(o['events'])) {
+    errs.push({ path: 'events', message: '缺少 events 陣列' });
+  } else {
+    (o['events'] as unknown[]).forEach((e, i) => {
+      const ev = e as Record<string, unknown>;
+      if (typeof ev?.['tick'] !== 'number' || typeof ev?.['type'] !== 'string') {
+        errs.push({ path: `events[${i}]`, message: '需為 { tick:number, type:string, payload }' });
+      }
+    });
+  }
+  return errs;
 }
 
 function downloadBlob(blob: Blob, filename: string): void {
