@@ -1,6 +1,6 @@
 {
   "name": "@frameforge/scene-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "FrameForge 場景生成的 MCP 工具伺服器（get_scene_schema / compile_scene / validate_scene / save_scene）",
   "type": "module",
   "main": "dist/server.js",

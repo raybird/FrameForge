@@ -47,7 +47,7 @@ const SERVER_INSTRUCTIONS = [
 
 export function createServer(): McpServer {
   const server = new McpServer(
-    { name: 'frameforge-scene', version: '0.1.0' },
+    { name: 'frameforge-scene', version: '0.2.0' },
     { instructions: SERVER_INSTRUCTIONS },
   );
 
