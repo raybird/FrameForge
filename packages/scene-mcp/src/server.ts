@@ -13,7 +13,14 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { AUTHORING_GUIDE, schemaText, validateScene, compileToCanonical, saveScene } from './tools';
+import {
+  AUTHORING_GUIDE,
+  schemaText,
+  validateScene,
+  compileToCanonical,
+  saveScene,
+  renderScene,
+} from './tools';
 
 /** timeline 參數：物件或 JSON 字串皆可。 */
 const timelineArg = z.union([z.string(), z.record(z.string(), z.unknown())]);
@@ -31,6 +38,7 @@ const SERVER_INSTRUCTIONS = [
   '2) 依 schema 產生 authoring JSON。',
   '3) 呼叫 compile_scene 編譯成 canonical 並驗證；若回傳錯誤，依訊息修正後重試，直到通過。',
   '4) 呼叫 save_scene 寫出檔案，或把 canonical 交給使用者貼進 Studio 的「載入場景」。',
+  '5) 要直接產出影片時呼叫 render_scene（headless 渲染成 MP4；需本機 Chrome + scene-render）。',
   'validate_scene 可在任一階段檢查（authoring 或 canonical 皆可）。',
   '',
   '要點：內容多為純函數 f(t)（authored track，可任意 seek）；互動片段用 controller。顏色用 0xRRGGBB 數字或 CSS 字串。',
@@ -100,6 +108,24 @@ export function createServer(): McpServer {
     },
     async ({ timeline, path }) => {
       const r = await saveScene(timeline, path);
+      return { content: [{ type: 'text', text: r.text }] };
+    },
+  );
+
+  server.registerTool(
+    'render_scene',
+    {
+      title: '把場景渲染成 MP4',
+      description:
+        '先編譯/驗證（authoring 或 canonical 皆可），通過才用 headless Chrome 逐幀渲染成 MP4 檔（生成→影片一路到底）。' +
+        '需要本機有 Chrome 與 scene-render（frameforge-scene-render，或設 FRAMEFORGE_RENDER_CMD）；未通過驗證則不渲染、回傳可修正的錯誤。',
+      inputSchema: {
+        timeline: timelineArg,
+        path: z.string().min(1).describe('輸出 MP4 路徑，例：./out.mp4'),
+      },
+    },
+    async ({ timeline, path }) => {
+      const r = await renderScene(timeline, path);
       return { content: [{ type: 'text', text: r.text }] };
     },
   );

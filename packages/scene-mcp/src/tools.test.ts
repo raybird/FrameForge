@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { schemaText, validateScene, compileToCanonical, saveScene } from './tools';
+import { schemaText, validateScene, compileToCanonical, saveScene, renderScene } from './tools';
 
 const VALID = {
   id: 's',
@@ -125,5 +125,49 @@ describe('saveScene', () => {
     expect(r.ok).toBe(false);
     expect(write).not.toHaveBeenCalled();
     expect(r.text).toContain('未寫入');
+  });
+});
+
+describe('renderScene', () => {
+  it('合法 → 先編譯出 canonical 再交給渲染器，回傳路徑與位元組', async () => {
+    const write = vi.fn(async (_path: string, _content: string) => {});
+    const render = vi.fn(async (_scenePath: string, _outPath: string) => ({ bytes: 12345 }));
+    const r = await renderScene(VALID, './out.mp4', render, write);
+    expect(r.ok).toBe(true);
+    expect(r.bytes).toBe(12345);
+    expect(r.path).toMatch(/out\.mp4$/);
+    // 有先把 canonical 寫成暫存場景檔，並用它呼叫渲染器
+    expect(write).toHaveBeenCalledOnce();
+    const [scenePathArg] = render.mock.calls[0];
+    expect(scenePathArg).toMatch(/out\.mp4\.scene\.json$/);
+    expect(JSON.parse(write.mock.calls[0][1] as string).id).toBe('s');
+  });
+
+  it('接受 authoring 形式（先編譯成 canonical）', async () => {
+    const write = vi.fn(async () => {});
+    const render = vi.fn(async () => ({ bytes: 1 }));
+    const r = await renderScene(AUTHORED, './a.mp4', render, write);
+    expect(r.ok).toBe(true);
+    expect(render).toHaveBeenCalledOnce();
+  });
+
+  it('不合法 → 不渲染、回傳可修正的錯誤', async () => {
+    const write = vi.fn(async () => {});
+    const render = vi.fn(async () => ({ bytes: 1 }));
+    const r = await renderScene(INVALID, './x.mp4', render, write);
+    expect(r.ok).toBe(false);
+    expect(render).not.toHaveBeenCalled();
+    expect(r.text).toContain('未渲染');
+  });
+
+  it('渲染器丟錯 → 回傳含環境需求提示的失敗訊息', async () => {
+    const write = vi.fn(async () => {});
+    const render = vi.fn(async () => {
+      throw new Error('Chrome not found');
+    });
+    const r = await renderScene(VALID, './x.mp4', render, write);
+    expect(r.ok).toBe(false);
+    expect(r.text).toContain('渲染失敗');
+    expect(r.text).toContain('FRAMEFORGE_RENDER_CMD');
   });
 });

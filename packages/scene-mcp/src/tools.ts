@@ -6,7 +6,9 @@
  * compileScene 編譯成 canonical；驗證/存檔工具兩種形式都吃（loadScene 自動辨識）。
  */
 
-import { writeFile as fsWriteFile } from 'node:fs/promises';
+import { writeFile as fsWriteFile, stat, unlink } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { resolve } from 'node:path';
 import {
   sceneAuthoringJsonSchema,
@@ -117,6 +119,75 @@ export async function saveScene(
     errors: [],
     text: `已寫入 ${abs}。在 Studio 用「載入場景」選此檔或貼上內容即可播放/匯出。`,
   };
+}
+
+// ─────────────────────────────────────────────────────────────
+// render（先編譯/驗證，通過才用 headless Chrome 渲染成 MP4）
+// ─────────────────────────────────────────────────────────────
+
+export interface RenderResult {
+  ok: boolean;
+  path?: string;
+  bytes?: number;
+  errors: ValidationError[];
+  text: string;
+}
+
+/** 注入式渲染器：吃 canonical 場景檔路徑 + 輸出 MP4 路徑，回傳位元組數。 */
+export type SceneRenderer = (canonicalScenePath: string, outPath: string) => Promise<{ bytes: number }>;
+
+const execFileAsync = promisify(execFile);
+
+/** 預設渲染器：呼叫 scene-render CLI（frameforge-scene-render，或 FRAMEFORGE_RENDER_CMD 覆寫）。 */
+const defaultRenderer: SceneRenderer = async (scenePath, outPath) => {
+  const cmd = (process.env.FRAMEFORGE_RENDER_CMD ?? 'frameforge-scene-render').trim();
+  const parts = cmd.split(/\s+/);
+  await execFileAsync(parts[0], [...parts.slice(1), scenePath, outPath], { maxBuffer: 4 << 20 });
+  const { size } = await stat(outPath);
+  return { bytes: size };
+};
+
+/**
+ * 渲染場景為 MP4：先 compile/驗證（不需 Chrome，快速回錯給 agent 修正），
+ * 通過才呼叫渲染器（headless Chrome 逐幀）。渲染器可注入以便測試。
+ */
+export async function renderScene(
+  input: unknown,
+  outPath: string,
+  render: SceneRenderer = defaultRenderer,
+  writeTmp: (path: string, content: string) => Promise<void> = fsWriteFile,
+): Promise<RenderResult> {
+  // validateScene 自動辨識 authoring / canonical，通過即得 canonical timeline（不需 Chrome）。
+  const v = validateScene(input);
+  if (!v.ok || !v.timeline) {
+    return { ok: false, errors: v.errors, text: `未渲染（未通過驗證）：\n${v.text}` };
+  }
+
+  const out = resolve(outPath);
+  const sceneTmp = `${out}.scene.json`;
+  await writeTmp(sceneTmp, JSON.stringify(v.timeline, null, 2));
+  try {
+    const { bytes } = await render(sceneTmp, out);
+    return {
+      ok: true,
+      path: out,
+      bytes,
+      errors: [],
+      text: `✅ 已渲染 → ${out}（${bytes} bytes）。可直接播放 / 分享。`,
+    };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return {
+      ok: false,
+      errors: [],
+      text:
+        `❌ 渲染失敗：${msg}\n` +
+        'render_scene 需要本機有 Chrome 與 scene-render CLI（frameforge-scene-render），' +
+        '或以環境變數 FRAMEFORGE_RENDER_CMD 指定渲染指令。',
+    };
+  } finally {
+    await unlink(sceneTmp).catch(() => {});
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
