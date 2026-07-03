@@ -1,0 +1,23 @@
+{
+  "name": "@frameforge/scene-render",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Node 端把場景渲染成 MP4：puppeteer-core 驅動系統 Chrome，重用 Studio 作渲染面",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "bin": {
+    "frameforge-scene-render": "src/cli.ts"
+  },
+  "dependencies": {
+    "puppeteer-core": "^24.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.22.5",
+    "typescript": "^5.6.0"
+  }
+}
