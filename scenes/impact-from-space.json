@@ -1,0 +1,1015 @@
+{
+  "id": "impact-from-space",
+  "name": "從太空目睹：白堊紀滅絕撞擊",
+  "tickRate": 60,
+  "durationTicks": 1080,
+  "entities": [
+    {
+      "id": "camera",
+      "name": "軌道攝影機",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 3,
+              "z": 26
+            },
+            "rotation": {
+              "x": -0.11487660541689915,
+              "y": 0,
+              "z": 0
+            }
+          }
+        },
+        {
+          "type": "Camera",
+          "data": {
+            "projection": "perspective",
+            "fov": 45,
+            "near": 0.1,
+            "far": 200
+          }
+        }
+      ]
+    },
+    {
+      "id": "earth",
+      "name": "地球",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#2b6f9e",
+            "size": 10
+          }
+        }
+      ]
+    },
+    {
+      "id": "atmosphere",
+      "name": "大氣光暈",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#7ec8ff",
+            "size": 10.7
+          }
+        }
+      ]
+    },
+    {
+      "id": "star1",
+      "name": "星點1",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": -9,
+              "y": 6,
+              "z": -6
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#cfd8e3",
+            "size": 0.14
+          }
+        }
+      ]
+    },
+    {
+      "id": "star2",
+      "name": "星點2",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 7,
+              "y": 8,
+              "z": -10
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#cfd8e3",
+            "size": 0.12
+          }
+        }
+      ]
+    },
+    {
+      "id": "star3",
+      "name": "星點3",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": -12,
+              "y": -2,
+              "z": -8
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#e8eef4",
+            "size": 0.16
+          }
+        }
+      ]
+    },
+    {
+      "id": "star4",
+      "name": "星點4",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 10,
+              "y": -5,
+              "z": -12
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#cfd8e3",
+            "size": 0.12
+          }
+        }
+      ]
+    },
+    {
+      "id": "star5",
+      "name": "星點5",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": -5,
+              "y": 10,
+              "z": -14
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#e8eef4",
+            "size": 0.18
+          }
+        }
+      ]
+    },
+    {
+      "id": "star6",
+      "name": "星點6",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 13,
+              "y": 4,
+              "z": -4
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#cfd8e3",
+            "size": 0.12
+          }
+        }
+      ]
+    },
+    {
+      "id": "meteor",
+      "name": "隕石",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 16,
+              "y": 10,
+              "z": 8
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#fff3d6",
+            "size": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "meteorTail",
+      "name": "隕石尾焰",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 16.6,
+              "y": 10.4,
+              "z": 8.3
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#ffb347",
+            "size": 0.9
+          }
+        }
+      ]
+    },
+    {
+      "id": "flash",
+      "name": "撞擊閃光",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 2.25,
+              "y": 1.75,
+              "z": 4.1
+            },
+            "scale": {
+              "x": 0.1,
+              "y": 0.1,
+              "z": 0.1
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#ffffff",
+            "size": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "shockwave",
+      "name": "衝擊波",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 2.25,
+              "y": 1.75,
+              "z": 4.1
+            },
+            "scale": {
+              "x": 0.5,
+              "y": 0.5,
+              "z": 0.5
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#ffd9a0",
+            "size": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "ember",
+      "name": "撞擊點餘燼",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 2.1,
+              "y": 1.6,
+              "z": 3.9
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#8b2500",
+            "size": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "ash",
+      "name": "塵霧籠罩",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            }
+          }
+        },
+        {
+          "type": "Mesh",
+          "data": {
+            "shape": "sphere",
+            "color": "#3a3a3a",
+            "size": 10.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "title",
+      "name": "標題",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 8.4,
+              "z": 6
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "白堊紀 · 平靜的最後一日",
+            "fontSize": 42,
+            "color": "#eaf2f8",
+            "align": "center"
+          }
+        }
+      ]
+    },
+    {
+      "id": "subtitle",
+      "name": "副標",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 7.2,
+              "z": 6
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "六千六百萬年前",
+            "fontSize": 26,
+            "color": "#9fb8c8",
+            "align": "center"
+          }
+        }
+      ]
+    },
+    {
+      "id": "caption",
+      "name": "接近字幕",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": -7.6,
+              "z": 6
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "一顆直徑十公里的小行星，正在接近",
+            "fontSize": 24,
+            "color": "#c8d6e0",
+            "align": "center"
+          }
+        }
+      ]
+    },
+    {
+      "id": "endText",
+      "name": "結語一",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 8.4,
+              "z": 6
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "恐龍時代，就此落幕",
+            "fontSize": 40,
+            "color": "#d8d3c8",
+            "align": "center"
+          }
+        }
+      ]
+    },
+    {
+      "id": "endText2",
+      "name": "結語二",
+      "components": [
+        {
+          "type": "Transform",
+          "data": {
+            "position": {
+              "x": 0,
+              "y": 7.1,
+              "z": 6
+            }
+          }
+        },
+        {
+          "type": "Text",
+          "data": {
+            "content": "地球上約四分之三的物種，自此消失",
+            "fontSize": 24,
+            "color": "#a8a29a",
+            "align": "center"
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [],
+  "tracks": [
+    {
+      "id": "cam-push",
+      "entityId": "camera",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": {
+            "x": 0,
+            "y": 3,
+            "z": 26
+          },
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 1080,
+          "value": {
+            "x": 0,
+            "y": 2,
+            "z": 17
+          }
+        }
+      ]
+    },
+    {
+      "id": "atmosphere-opacity",
+      "entityId": "atmosphere",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0.12
+        },
+        {
+          "tick": 600,
+          "value": 0.12,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 900,
+          "value": 0.04
+        }
+      ]
+    },
+    {
+      "id": "meteor-visible",
+      "entityId": "meteor",
+      "kind": "authored",
+      "target": "visible",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": false,
+          "easing": "step"
+        },
+        {
+          "tick": 240,
+          "value": true,
+          "easing": "step"
+        },
+        {
+          "tick": 510,
+          "value": true,
+          "easing": "step"
+        },
+        {
+          "tick": 513,
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "meteor-pos",
+      "entityId": "meteor",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 240,
+          "value": {
+            "x": 16,
+            "y": 10,
+            "z": 8
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 510,
+          "value": {
+            "x": 2.25,
+            "y": 1.75,
+            "z": 4.1
+          }
+        }
+      ]
+    },
+    {
+      "id": "meteor-scale",
+      "entityId": "meteor",
+      "kind": "authored",
+      "target": "transform.scale",
+      "keyframes": [
+        {
+          "tick": 240,
+          "value": {
+            "x": 0.6,
+            "y": 0.6,
+            "z": 0.6
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 510,
+          "value": {
+            "x": 1.8,
+            "y": 1.8,
+            "z": 1.8
+          }
+        }
+      ]
+    },
+    {
+      "id": "tail-visible",
+      "entityId": "meteorTail",
+      "kind": "authored",
+      "target": "visible",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": false,
+          "easing": "step"
+        },
+        {
+          "tick": 240,
+          "value": true,
+          "easing": "step"
+        },
+        {
+          "tick": 510,
+          "value": true,
+          "easing": "step"
+        },
+        {
+          "tick": 513,
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "tail-pos",
+      "entityId": "meteorTail",
+      "kind": "authored",
+      "target": "transform.position",
+      "keyframes": [
+        {
+          "tick": 240,
+          "value": {
+            "x": 16.6,
+            "y": 10.4,
+            "z": 8.3
+          },
+          "easing": "easeIn"
+        },
+        {
+          "tick": 510,
+          "value": {
+            "x": 2.7,
+            "y": 2.05,
+            "z": 4.35
+          }
+        }
+      ]
+    },
+    {
+      "id": "tail-opacity",
+      "entityId": "meteorTail",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 240,
+          "value": 0.25,
+          "easing": "easeIn"
+        },
+        {
+          "tick": 510,
+          "value": 0.55
+        }
+      ]
+    },
+    {
+      "id": "flash-visible",
+      "entityId": "flash",
+      "kind": "authored",
+      "target": "visible",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": false,
+          "easing": "step"
+        },
+        {
+          "tick": 504,
+          "value": true,
+          "easing": "step"
+        },
+        {
+          "tick": 564,
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "flash-scale",
+      "entityId": "flash",
+      "kind": "authored",
+      "target": "transform.scale",
+      "keyframes": [
+        {
+          "tick": 504,
+          "value": {
+            "x": 0.1,
+            "y": 0.1,
+            "z": 0.1
+          },
+          "easing": "easeOut"
+        },
+        {
+          "tick": 558,
+          "value": {
+            "x": 7,
+            "y": 7,
+            "z": 7
+          }
+        }
+      ]
+    },
+    {
+      "id": "flash-opacity",
+      "entityId": "flash",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 504,
+          "value": 0,
+          "easing": "step"
+        },
+        {
+          "tick": 510,
+          "value": 1,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 558,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "shockwave-visible",
+      "entityId": "shockwave",
+      "kind": "authored",
+      "target": "visible",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": false,
+          "easing": "step"
+        },
+        {
+          "tick": 516,
+          "value": true,
+          "easing": "step"
+        },
+        {
+          "tick": 732,
+          "value": false
+        }
+      ]
+    },
+    {
+      "id": "shockwave-scale",
+      "entityId": "shockwave",
+      "kind": "authored",
+      "target": "transform.scale",
+      "keyframes": [
+        {
+          "tick": 516,
+          "value": {
+            "x": 0.5,
+            "y": 0.5,
+            "z": 0.5
+          },
+          "easing": "easeOut"
+        },
+        {
+          "tick": 720,
+          "value": {
+            "x": 5.5,
+            "y": 5.5,
+            "z": 5.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "shockwave-opacity",
+      "entityId": "shockwave",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 516,
+          "value": 0.8,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 720,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "ember-opacity",
+      "entityId": "ember",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0,
+          "easing": "step"
+        },
+        {
+          "tick": 540,
+          "value": 0,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 600,
+          "value": 0.9,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 1080,
+          "value": 0.5
+        }
+      ]
+    },
+    {
+      "id": "ash-opacity",
+      "entityId": "ash",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 0,
+          "value": 0,
+          "easing": "step"
+        },
+        {
+          "tick": 540,
+          "value": 0,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 900,
+          "value": 0.85,
+          "easing": "linear"
+        },
+        {
+          "tick": 1080,
+          "value": 0.88
+        }
+      ]
+    },
+    {
+      "id": "title-opacity",
+      "entityId": "title",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 30,
+          "value": 0,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 90,
+          "value": 1,
+          "easing": "linear"
+        },
+        {
+          "tick": 228,
+          "value": 1,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 300,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "subtitle-opacity",
+      "entityId": "subtitle",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 60,
+          "value": 0,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 120,
+          "value": 1,
+          "easing": "linear"
+        },
+        {
+          "tick": 228,
+          "value": 1,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 300,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "caption-opacity",
+      "entityId": "caption",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 300,
+          "value": 0,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 360,
+          "value": 1,
+          "easing": "linear"
+        },
+        {
+          "tick": 468,
+          "value": 1,
+          "easing": "easeOut"
+        },
+        {
+          "tick": 504,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "id": "endtext-opacity",
+      "entityId": "endText",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 810,
+          "value": 0,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 900,
+          "value": 1
+        }
+      ]
+    },
+    {
+      "id": "endtext2-opacity",
+      "entityId": "endText2",
+      "kind": "authored",
+      "target": "opacity",
+      "keyframes": [
+        {
+          "tick": 930,
+          "value": 0,
+          "easing": "easeInOut"
+        },
+        {
+          "tick": 1020,
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "tick": 510,
+      "type": "impact",
+      "payload": {
+        "note": "隕石觸地，K-Pg 滅絕事件開始"
+      }
+    }
+  ]
+}
